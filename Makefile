@@ -1,6 +1,6 @@
 SCRIPT=plugin/recover.vim autoload/recover.vim
-DOC=doc/histwinPlugin.txt
-PLUGIN=histwin
+DOC=doc/recoverPlugin.txt
+PLUGIN=recover
 
 .PHONY : $(PLUGIN).vba
 
@@ -22,10 +22,10 @@ uninstall:
 undo:
 	for i in */*.orig; do mv -f "$$i" "$${i%.*}"; done
 
-histwin.vba:
+recover.vba:
 	vim -N -c 'ru! vimballPlugin.vim' -c ':let g:vimball_home=getcwd()'  -c ':call append("0", ["plugin/recover.vim", "autoload/recover.vim", "doc/recoverPlugin.txt"])' -c '$$d' -c ':%MkVimball ${PLUGIN}' -c':q!'
 
-histwin:
+recover:
 	rm -f ${PLUGIN}.vba
 	perl -i.orig -pne 'if (/Version:/) {s/\.(\d)*/sprintf(".%d", 1+$$1)/e}' ${SCRIPT}
 	perl -i -pne 'if (/GetLatestVimScripts:/) {s/(\d+)\s+:AutoInstall:/sprintf("%d :AutoInstall:", 1+$$1)/e}' ${SCRIPT}
