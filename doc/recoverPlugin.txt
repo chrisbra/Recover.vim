@@ -1,0 +1,53 @@
+*recover.vim*	Show differences for recovered files
+
+Author:  Christian Brabandt <cb@256bit.org>
+Version: 0.2 Tue, 20 Apr 2010 00:04:14 +0200
+
+Copyright: (c) 2009, 2010 by Christian Brabandt		
+           The VIM LICENSE applies to SudoEdit.vim and SudoEdit.txt
+           (see |copyright|) except use SudoEdit instead of "Vim".
+	   NO WARRANTY, EXPRESS OR IMPLIED.  USE AT-YOUR-OWN-RISK.
+
+
+==============================================================================
+1. Contents							*recoverPlugin*
+
+	1.  Contents.....................................: |recoverPlugin|
+	2.  recover Manual...............................: |recover-manual|
+	3.  recover History..............................: |recover-history|
+
+==============================================================================
+2. recover Manual					*recover-manual*
+
+Functionality
+
+When using |recovery|, it is hard to tell, what has been changed between the
+recovered file and the actual on disk version. The aim of this plugin is, to
+have an easy way to see differences, between the recovered files and the files
+restored on disk.
+
+Therefore this plugin sets up an auto command, that will create a diff buffer
+between the recovered file and the on-disk version of the same file. You can
+easily see, what has been changed and save your recovered work back to the
+file on disk.
+
+By default this plugin is enabled. To disable it, use >
+    :RecoverPluginDisable
+
+To enable this plugin again, use >
+    :RecoverPluginEnable
+
+
+==============================================================================
+3. recover History					    *recover-history*
+	0.3: Apr 20, 2010       : first public verion
+				: put plugin on a public repository 
+				  (http://github.com/chrisbra/Recover.vim)
+	0.2: Apr 18, 2010       : Internal version, some cleanup,
+	                          bugfixes for windows
+	0.1: Apr 17, 2010	: Internal version, First working version, 
+				  using simple commands
+
+==============================================================================
+Modeline:
+vim:tw=78:ts=8:ft=help
