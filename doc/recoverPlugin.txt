@@ -1,11 +1,11 @@
 *recover.vim*	Show differences for recovered files
 
 Author:  Christian Brabandt <cb@256bit.org>
-Version: 0.2 Tue, 20 Apr 2010 00:04:14 +0200
+Version: 0.3 Wed, 21 Apr 2010 00:00:13 +0200
 
 Copyright: (c) 2009, 2010 by Christian Brabandt		
-           The VIM LICENSE applies to SudoEdit.vim and SudoEdit.txt
-           (see |copyright|) except use SudoEdit instead of "Vim".
+           The VIM LICENSE applies to recoverPlugin.vim and recoverPlugin.txt
+           (see |copyright|) except use recoverPlugin instead of "Vim".
 	   NO WARRANTY, EXPRESS OR IMPLIED.  USE AT-YOUR-OWN-RISK.
 
 
