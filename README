@@ -1,0 +1,81 @@
+recover.vim	Show differences for recovered files
+
+I) Directory layout 
+=====================
+This repository contains the Join.vim plugin, the unit tests and the 
+documentation. The current directory structure looks like this:
+
+doc/
+plugin/
+autoload/
+Makefile
+README
+
+The subdirectory doc/ contains the documentation for the plugin.
+The subdirectory plugin/ contains the Vim plugin and the autoloaded
+file is located below autoload/
+
+II) Installation
+===============
+This plugin comes as vimball, which makes it really easy to install it
+into the right place. 
+1) Edit recover.vba with your vim (:e recover.vba) 
+2) From within vim, simply source the file (using :so %)
+3) Restart vim to autoload the plugin and the documentation (:q)
+4) Read the help at :h recoverPlugin.txt 
+
+III) Documentation
+==================
+*recover.vim*	Show differences for recovered files
+
+Author:  Christian Brabandt <cb@256bit.org>
+Version: 0.3 Wed, 21 Apr 2010 00:00:13 +0200
+
+Copyright: (c) 2009, 2010 by Christian Brabandt		
+           The VIM LICENSE applies to SudoEdit.vim and SudoEdit.txt
+           (see |copyright|) except use SudoEdit instead of "Vim".
+	   NO WARRANTY, EXPRESS OR IMPLIED.  USE AT-YOUR-OWN-RISK.
+
+
+==============================================================================
+1. Contents							*recoverPlugin*
+
+	1.  Contents.....................................: |recoverPlugin|
+	2.  recover Manual...............................: |recover-manual|
+	3.  recover History..............................: |recover-history|
+
+==============================================================================
+2. recover Manual					*recover-manual*
+
+Functionality
+
+When using |recovery|, it is hard to tell, what has been changed between the
+recovered file and the actual on disk version. The aim of this plugin is, to
+have an easy way to see differences, between the recovered files and the files
+restored on disk.
+
+Therefore this plugin sets up an auto command, that will create a diff buffer
+between the recovered file and the on-disk version of the same file. You can
+easily see, what has been changed and save your recovered work back to the
+file on disk.
+
+By default this plugin is enabled. To disable it, use >
+    :RecoverPluginDisable
+
+To enable this plugin again, use >
+    :RecoverPluginEnable
+
+
+==============================================================================
+3. recover History					    *recover-history*
+	0.3: Apr 20, 2010       : first public verion
+				: put plugin on a public repository 
+				  (http://github.com/chrisbra/Recover.vim)
+	0.2: Apr 18, 2010       : Internal version, some cleanup,
+	                          bugfixes for windows
+	0.1: Apr 17, 2010	: Internal version, First working version, 
+				  using simple commands
+
+==============================================================================
+Modeline:
+vim:tw=78:ts=8:ft=help
