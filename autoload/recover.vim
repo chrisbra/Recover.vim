@@ -9,9 +9,9 @@
 " License: VIM License
 " GetLatestVimScripts: Not Yet
 "
-fu! recover#Recover(on)
+fu! recover#Recover(on) "{{{1
     if a:on
-	call recover#ModifySTL()
+	call s:ModifySTL()
 	if !exists("s:old_vsc")
 	    let s:old_vsc = v:swapchoice
 	endif
@@ -32,14 +32,19 @@ fu! recover#Recover(on)
 	"call recover#ResetSTL()
 	let g:diff_file=0
     endif
-    echo "RecoverPlugin" (a:on ? "Enabled" : "Disabled")
+    "echo "RecoverPlugin" (a:on ? "Enabled" : "Disabled")
 endfu
 
-fu! recover#AutoCmdBRP(on)
+fu! recover#AutoCmdBRP(on) "{{{1
     if a:on
 	    augroup SwapBRP
 	    au!
-	    exe ":au BufReadPost " substitute(escape(fnamemodify(expand('<afile>'), ':p'), ' '), '\\', '/', 'g') " :call recover#DiffRecoveredFile()"
+	    "exe ":au BufReadPost " substitute(escape(fnamemodify(expand('<afile>'), ':p'), ' \\'), '\\', '/', 'g') " :call recover#DiffRecoveredFile()"
+	    " Escape spaces and backslashes
+	    " substitute backslashes with forward slashes so that it works
+	    " with windows (ok this might cause trouble with files, that have
+	    " a backslash in their name, as it could happen on Unix)
+	    exe ":au BufReadPost " escape(substitute(fnamemodify(expand('<afile>'), ':p'), '\\', '/', 'g'), ' \\')" :call recover#DiffRecoveredFile()"
 	    augroup END
     else
 	    augroup SwapBRP
@@ -48,7 +53,7 @@ fu! recover#AutoCmdBRP(on)
     endif
 endfu
 
-fu! recover#DiffRecoveredFile()
+fu! recover#DiffRecoveredFile() "{{{1
     "if exists("g:diff_file") && g:diff_file==1
 	" For some reason, this only works with feedkeys.
 	" I am not sure  why.
@@ -70,18 +75,18 @@ fu! recover#DiffRecoveredFile()
     "endif
 endfu
 
-fu! recover#EchoMsg(msg)
+fu! s:EchoMsg(msg) "{{{1
     echohl WarningMsg
     echomsg a:msg
     echohl Normal
 endfu
 
-fu! recover#ModifySTL()
+fu! s:ModifySTL() "{{{1
     :let s:ostl=&stl
     :let &stl=substitute(&stl, '%f', "\\0 %{exists('b:mod')?('['.b:mod.']') : ''}", 'g')
 endfu
 
-fu! recover#ResetSTL()
+fu! s:ResetSTL() "{{{1
     if exists("s:ostl")
 	let &stl=s:ostl
     endif

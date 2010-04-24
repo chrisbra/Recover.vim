@@ -38,7 +38,7 @@ unlet s:keepcpo
 " Modeline {{{1
 " vim: fdm=marker sw=2 sts=2 ts=8 fdl=0
 autoload/recover.vim	[[[1
-88
+89
 " Vim plugin for diffing when swap file was found
 " ---------------------------------------------------------------
 " Author: Christian Brabandt <cb@256bit.org>
@@ -50,9 +50,9 @@ autoload/recover.vim	[[[1
 " License: VIM License
 " GetLatestVimScripts: Not Yet
 "
-fu! recover#Recover(on)
+fu! recover#Recover(on) "{{{1
     if a:on
-	call recover#ModifySTL()
+	call s:ModifySTL()
 	if !exists("s:old_vsc")
 	    let s:old_vsc = v:swapchoice
 	endif
@@ -73,14 +73,15 @@ fu! recover#Recover(on)
 	"call recover#ResetSTL()
 	let g:diff_file=0
     endif
-    echo "RecoverPlugin" (a:on ? "Enabled" : "Disabled")
+    "echo "RecoverPlugin" (a:on ? "Enabled" : "Disabled")
 endfu
 
-fu! recover#AutoCmdBRP(on)
+fu! recover#AutoCmdBRP(on) "{{{1
     if a:on
 	    augroup SwapBRP
 	    au!
-	    exe ":au BufReadPost " substitute(escape(fnamemodify(expand('<afile>'), ':p'), ' '), '\\', '/', 'g') " :call recover#DiffRecoveredFile()"
+	    "exe ":au BufReadPost " substitute(escape(fnamemodify(expand('<afile>'), ':p'), ' \\'), '\\', '/', 'g') " :call recover#DiffRecoveredFile()"
+	    exe ":au BufReadPost " escape(substitute(fnamemodify(expand('<afile>'), ':p'), '\\', '/', 'g'), ' \\')" :call recover#DiffRecoveredFile()"
 	    augroup END
     else
 	    augroup SwapBRP
@@ -89,7 +90,7 @@ fu! recover#AutoCmdBRP(on)
     endif
 endfu
 
-fu! recover#DiffRecoveredFile()
+fu! recover#DiffRecoveredFile() "{{{1
     "if exists("g:diff_file") && g:diff_file==1
 	" For some reason, this only works with feedkeys.
 	" I am not sure  why.
@@ -111,18 +112,18 @@ fu! recover#DiffRecoveredFile()
     "endif
 endfu
 
-fu! recover#EchoMsg(msg)
+fu! s:EchoMsg(msg) "{{{1
     echohl WarningMsg
     echomsg a:msg
     echohl Normal
 endfu
 
-fu! recover#ModifySTL()
+fu! s:ModifySTL() "{{{1
     :let s:ostl=&stl
     :let &stl=substitute(&stl, '%f', "\\0 %{exists('b:mod')?('['.b:mod.']') : ''}", 'g')
 endfu
 
-fu! recover#ResetSTL()
+fu! s:ResetSTL() "{{{1
     if exists("s:ostl")
 	let &stl=s:ostl
     endif
@@ -135,8 +136,8 @@ Author:  Christian Brabandt <cb@256bit.org>
 Version: 0.3 Wed, 21 Apr 2010 00:00:13 +0200
 
 Copyright: (c) 2009, 2010 by Christian Brabandt		
-           The VIM LICENSE applies to SudoEdit.vim and SudoEdit.txt
-           (see |copyright|) except use SudoEdit instead of "Vim".
+           The VIM LICENSE applies to recoverPlugin.vim and recoverPlugin.txt
+           (see |copyright|) except use recoverPlugin instead of "Vim".
 	   NO WARRANTY, EXPRESS OR IMPLIED.  USE AT-YOUR-OWN-RISK.
 
 

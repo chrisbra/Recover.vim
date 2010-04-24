@@ -1,39 +1,11 @@
-recover.vim	Show differences for recovered files
-
-I) Directory layout 
-=====================
-This repository contains the Join.vim plugin, the unit tests and the 
-documentation. The current directory structure looks like this:
-
-doc/
-plugin/
-autoload/
-Makefile
-README
-
-The subdirectory doc/ contains the documentation for the plugin.
-The subdirectory plugin/ contains the Vim plugin and the autoloaded
-file is located below autoload/
-
-II) Installation
-===============
-This plugin comes as vimball, which makes it really easy to install it
-into the right place. 
-1) Edit recover.vba with your vim (:e recover.vba) 
-2) From within vim, simply source the file (using :so %)
-3) Restart vim to autoload the plugin and the documentation (:q)
-4) Read the help at :h recoverPlugin.txt 
-
-III) Documentation
-==================
 *recover.vim*	Show differences for recovered files
 
 Author:  Christian Brabandt <cb@256bit.org>
 Version: 0.3 Wed, 21 Apr 2010 00:00:13 +0200
 
 Copyright: (c) 2009, 2010 by Christian Brabandt		
-           The VIM LICENSE applies to SudoEdit.vim and SudoEdit.txt
-           (see |copyright|) except use SudoEdit instead of "Vim".
+           The VIM LICENSE applies to recoverPlugin.vim and recoverPlugin.txt
+           (see |copyright|) except use recoverPlugin instead of "Vim".
 	   NO WARRANTY, EXPRESS OR IMPLIED.  USE AT-YOUR-OWN-RISK.
 
 
