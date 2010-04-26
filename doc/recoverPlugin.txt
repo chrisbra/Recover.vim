@@ -1,7 +1,7 @@
 *recover.vim*	Show differences for recovered files
 
 Author:  Christian Brabandt <cb@256bit.org>
-Version: 0.3 Wed, 21 Apr 2010 00:00:13 +0200
+Version: 0.4 Mon, 26 Apr 2010 23:23:41 +0200
 
 Copyright: (c) 2009, 2010 by Christian Brabandt		
            The VIM LICENSE applies to recoverPlugin.vim and recoverPlugin.txt
@@ -37,9 +37,22 @@ By default this plugin is enabled. To disable it, use >
 To enable this plugin again, use >
     :RecoverPluginEnable
 
+If your Vim was built with |+balloon_eval|, recover.vim will also set up an
+balloon expression, that shows you, which buffer contains the recovered
+version of your file and which buffer contains the unmodified on-disk version
+of your file, if you move the mouse of the buffer. (See |balloon-eval|).
+
+If you have setup your 'statusline', recover.vim will also inject some info
+(which buffer contains the on-disk version and which buffer contains the
+modified, recovered version). Additionally the buffer that is read-only, will
+have a filename (|:f|) of something like 'original file (on disk-version)'. If
+you want to save that version, use |:saveas|.
 
 ==============================================================================
 3. recover History					    *recover-history*
+	0.4: Apr 26, 2010       : handle Windows and Unix path differently
+	                        : Code cleanup
+				: Enabled |:GLVS|
 	0.3: Apr 20, 2010       : first public verion
 				: put plugin on a public repository 
 				  (http://github.com/chrisbra/Recover.vim)

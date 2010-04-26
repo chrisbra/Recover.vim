@@ -1,11 +1,11 @@
 " Vim plugin for diffing when swap file was found
-" Last Change: Tue, 20 Apr 2010 23:59:22 +0200
+" Last Change: Mon, 26 Apr 2010 23:23:41 +0200
 
-" Version: 0.3
+" Version: 0.4
 " Author: Christian Brabandt <cb@256bit.org>
 " Script:  http://www.vim.org/scripts/script.php?script_id=2709 
 " License: VIM License
-" GetLatestVimScripts: Not yet enabled
+" GetLatestVimScripts: 3068 2 :AutoInstall: recover.vim
 " Documentation: see :h recoverPlugin.txt
 
 " ---------------------------------------------------------------------
