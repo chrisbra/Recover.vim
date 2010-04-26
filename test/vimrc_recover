@@ -1,0 +1,4 @@
+set ut=100 swf
+:call feedkeys("0dw", 't')
+":redraw! 
+":exe ':!sleep 2 && kill -KILL '.getpid()
