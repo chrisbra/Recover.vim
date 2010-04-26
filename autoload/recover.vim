@@ -30,7 +30,7 @@ fu! recover#Recover(on) "{{{1
 	    let v:swapchoice=s:old_vsc
 	endif
 	"call recover#ResetSTL()
-	let g:diff_file=0
+	"let g:diff_file=0
     endif
     "echo "RecoverPlugin" (a:on ? "Enabled" : "Disabled")
 endfu
@@ -44,7 +44,11 @@ fu! recover#AutoCmdBRP(on) "{{{1
 	    " substitute backslashes with forward slashes so that it works
 	    " with windows (ok this might cause trouble with files, that have
 	    " a backslash in their name, as it could happen on Unix)
-	    exe ":au BufReadPost " escape(substitute(fnamemodify(expand('<afile>'), ':p'), '\\', '/', 'g'), ' \\')" :call recover#DiffRecoveredFile()"
+	    if has("win16") || has("win32") || has("win64") || has("win32unix")
+		exe ":au BufReadPost " escape(substitute(fnamemodify(expand('<afile>'), ':p'), '\\', '/', 'g'), ' \\')" :call recover#DiffRecoveredFile()"
+	    else
+		exe ":au BufReadPost " escape(fnamemodify(expand('<afile>'), ':p'), ' \\')" :call recover#DiffRecoveredFile()"
+	    endif
 	    augroup END
     else
 	    augroup SwapBRP
@@ -60,15 +64,16 @@ fu! recover#DiffRecoveredFile() "{{{1
 	call feedkeys(":diffthis\n", "t")
 	call feedkeys(":setl modified\n", "t")
 	call feedkeys(":let b:mod='recovered version'\n", "t")
-	call feedkeys(":noa vert new\n", "t")
+	call feedkeys(":vert new\n", "t")
 	call feedkeys(":0r #\n", "t")
 	call feedkeys(":f! " . escape(expand("<afile>")," ") . "\\ (on-disk\\ version)\n", "t")
 	call feedkeys(":diffthis\n", "t")
 	call feedkeys(":set bt=nowrite\n", "t")
 	call feedkeys(":let b:mod='unmodified version on-disk'\n", "t")
+	call feedkeys(':if has("balloon_eval")|:set ballooneval|set bexpr=recover#BalloonExprRecover()|endif'."\n", 't')
 	"call feedkeys(":redraw!\n", "t")
 	call feedkeys(":echo 'Found Swapfile, showing diff!'\n", "t")
-	unlet g:diff_file
+	"unlet g:diff_file
 	" Delete Autocommand
 	"call recover#Recover(0)
 	call recover#AutoCmdBRP(0)
@@ -91,3 +96,10 @@ fu! s:ResetSTL() "{{{1
 	let &stl=s:ostl
     endif
 endfu
+
+fu! recover#BalloonExprRecover() "{{{1
+    if exists("b:mod") 
+	return "This buffer shows the ".b:mod. " of your file"
+    endif
+endfun
+
