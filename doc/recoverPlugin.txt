@@ -1,7 +1,7 @@
 *recover.vim*   Show differences for recovered files
 
 Author:  Christian Brabandt <cb@256bit.org>
-Version: 0.4 Mon, 26 Apr 2010 23:23:41 +0200
+Version: 0.5 Tue, 04 May 2010 21:50:46 +0200
 
 Copyright: (c) 2009, 2010 by Christian Brabandt         
            The VIM LICENSE applies to recoverPlugin.vim and recoverPlugin.txt

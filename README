@@ -1,23 +1,23 @@
-*recover.vim*	Show differences for recovered files
+*recover.vim*   Show differences for recovered files
 
 Author:  Christian Brabandt <cb@256bit.org>
-Version: 0.4 Mon, 26 Apr 2010 23:23:41 +0200
+Version: 0.5 Tue, 04 May 2010 21:50:46 +0200
 
-Copyright: (c) 2009, 2010 by Christian Brabandt		
+Copyright: (c) 2009, 2010 by Christian Brabandt         
            The VIM LICENSE applies to recoverPlugin.vim and recoverPlugin.txt
            (see |copyright|) except use recoverPlugin instead of "Vim".
-	   NO WARRANTY, EXPRESS OR IMPLIED.  USE AT-YOUR-OWN-RISK.
+           NO WARRANTY, EXPRESS OR IMPLIED.  USE AT-YOUR-OWN-RISK.
 
 
 ==============================================================================
-1. Contents							*recoverPlugin*
+1. Contents                                                     *recoverPlugin*
 
-	1.  Contents.....................................: |recoverPlugin|
-	2.  recover Manual...............................: |recover-manual|
-	3.  recover History..............................: |recover-history|
+        1.  Contents.....................................: |recoverPlugin|
+        2.  recover Manual...............................: |recover-manual|
+        3.  recover History..............................: |recover-history|
 
 ==============================================================================
-2. recover Manual					*recover-manual*
+2. recover Manual                                       *recover-manual*
 
 Functionality
 
@@ -49,18 +49,22 @@ have a filename (|:f|) of something like 'original file (on disk-version)'. If
 you want to save that version, use |:saveas|.
 
 ==============================================================================
-3. recover History					    *recover-history*
-	0.4: Apr 26, 2010       : handle Windows and Unix path differently
-	                        : Code cleanup
-				: Enabled |:GLVS|
-	0.3: Apr 20, 2010       : first public verion
-				: put plugin on a public repository 
-				  (http://github.com/chrisbra/Recover.vim)
-	0.2: Apr 18, 2010       : Internal version, some cleanup,
-	                          bugfixes for windows
-	0.1: Apr 17, 2010	: Internal version, First working version, 
-				  using simple commands
+3. recover History                                          *recover-history*
+        0.5: May 04, 2010       :0r command in recover plugin adds extra \n
+                                  Patch by Sergey Khorev (Thanks!)
+                                : generate help file with 'et' set, so the 
+                                  README at github looks prettier
+        0.4: Apr 26, 2010       : handle Windows and Unix path differently
+                                : Code cleanup
+                                : Enabled |:GLVS|
+        0.3: Apr 20, 2010       : first public verion
+                                : put plugin on a public repository 
+                                  (http://github.com/chrisbra/Recover.vim)
+        0.2: Apr 18, 2010       : Internal version, some cleanup,
+                                  bugfixes for windows
+        0.1: Apr 17, 2010       : Internal version, First working version, 
+                                  using simple commands
 
 ==============================================================================
 Modeline:
-vim:tw=78:ts=8:ft=help
+vim:tw=78:ts=8:ft=help:et
