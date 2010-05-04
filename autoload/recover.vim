@@ -64,8 +64,13 @@ fu! recover#DiffRecoveredFile() "{{{1
 	call feedkeys(":setl modified\n", "t")
 	call feedkeys(":let b:mod='recovered version'\n", "t")
 	call feedkeys(":let g:recover_bufnr=bufnr('%')\n", "t")
+        let l:filetype = &ft
 	call feedkeys(":vert new\n", "t")
 	call feedkeys(":0r #\n", "t")
+        call feedkeys(":$delete _\n", "t")
+        if l:filetype != ""
+                call feedkeys(":setl filetype=".l:filetype."\n", "t")
+        endif
 	call feedkeys(":f! " . escape(expand("<afile>")," ") . "\\ (on-disk\\ version)\n", "t")
 	call feedkeys(":diffthis\n", "t")
 	call feedkeys(":set bt=nowrite\n", "t")
