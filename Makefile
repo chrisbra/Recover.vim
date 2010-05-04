@@ -1,6 +1,8 @@
-SCRIPT=plugin/recover.vim autoload/recover.vim
-DOC=doc/recoverPlugin.txt
-PLUGIN=recover
+SCRIPT=$(wildcard plugin/*.vim)
+AUTOL =$(wildcard autoload/*.vim)
+DOC=$(wildcard doc/*.txt)
+PLUGIN=$(shell basename "$$PWD")
+VERSION=$(shell sed -n '/Version:/{s/^.*\(\S\.\S\+\)$$/\1/;p}' $(SCRIPT))
 
 .PHONY: $(PLUGIN).vba README test
 
@@ -14,33 +16,38 @@ clean:
 dist-clean: clean
 
 install:
-	vim -N -c':so %' -c':q!' ${PLUGIN}.vba
+	vim -N -c':so %' -c':q!' $(PLUGIN)-$(VERSION).vba
 
 uninstall:
-	vim -N -c':RmVimball' -c':q!' ${PLUGIN}.vba
-	rm -f ${PLUGIN}.vba
+	vim -N -c':RmVimball' -c':q!' $(PLUGIN)-$(VERSION).vba
 
 undo:
 	for i in */*.orig; do mv -f "$$i" "$${i%.*}"; done
 
-recover.vba:
-	rm -f recover.vba
-	vim -N -c 'ru! vimballPlugin.vim' -c ':let g:vimball_home=getcwd()'  -c ':call append("0", ["plugin/recover.vim", "autoload/recover.vim", "doc/recoverPlugin.txt"])' -c '$$d' -c ':%MkVimball ${PLUGIN}' -c':q!'
-
 README:
 	cp -f $(DOC) README
 
-recover:
-	vim -N -c 'ru! vimballPlugin.vim' -c ':call append("0", ["autoload/recover.vim", "doc/recoverPlugin.txt", "plugin/recover.vim"])' -c '$$d' -c ':%MkVimball ${PLUGIN} .' -c':q!'
+$(PLUGIN).vba:
+	rm -f $(PLUGIN)-$(VERSION).vba
+	vim -N -c 'ru! vimballPlugin.vim' -c ':call append("0", [ "$(SCRIPT)", "$(AUTOL)", "$(DOC)"])' -c '$$d' -c ":%MkVimball $(PLUGIN)-$(VERSION)  ." -c':q!'
+	ln -f $(PLUGIN)-$(VERSION).vba $(PLUGIN).vba
+
+#recover.vba:
+#	rm -f recover.vba
+#	vim -N -c 'ru! vimballPlugin.vim' -c ':let g:vimball_home=getcwd()'  -c ':call append("0", ["plugin/recover.vim", "autoload/recover.vim", "doc/recoverPlugin.txt"])' -c '$$d' -c ':%MkVimball ${PLUGIN}' -c':q!'
+
+#recover:
+#	vim -N -c 'ru! vimballPlugin.vim' -c ':call append("0", ["autoload/recover.vim", "doc/recoverPlugin.txt", "plugin/recover.vim"])' -c '$$d' -c ':%MkVimball ${PLUGIN} .' -c':q!'
      
 release: version all
 
 version:
-	perl -i.orig -pne 'if (/Version:/) {s/\.(\d)*/sprintf(".%d", 1+$$1)/e}' ${SCRIPT}
-	perl -i -pne 'if (/GetLatestVimScripts:/) {s/(\d+)\s+:AutoInstall:/sprintf("%d :AutoInstall:", 1+$$1)/e}' ${SCRIPT}
+	perl -i.orig -pne 'if (/Version:/) {s/\.(\d*)/sprintf(".%d", 1+$$1)/e}' ${SCRIPT} ${AUTOL}
+	perl -i -pne 'if (/GetLatestVimScripts:/) {s/(\d+)\s+:AutoInstall:/sprintf("%d :AutoInstall:", 1+$$1)/e}' ${SCRIPT}  ${AUTOL}
 	#perl -i -pne 'if (/Last Change:/) {s/\d+\.\d+\.\d\+$$/sprintf("%s", `date -R`)/e}' ${SCRIPT}
-	perl -i -pne 'if (/Last Change:/) {s/(:\s+).*\n/sprintf(": %s", `date -R`)/e}' ${SCRIPT}
-	perl -i.orig -pne 'if (/Version:/) {s/\.(\d)+.*\n/sprintf(".%d %s", 1+$$1, `date -R`)/e}' ${DOC}
+	perl -i -pne 'if (/Last Change:/) {s/(:\s+).*\n/sprintf(": %s", `date -R`)/e}' ${SCRIPT} ${AUTOL}
+	perl -i.orig -pne 'if (/Version:/) {s/\.(\d+).*\n/sprintf(".%d %s", 1+$$1, `date -R`)/e}' ${DOC}
+	VERSION=$(shell sed -n '/Version:/{s/^.*\(\S\.\S\+\)$$/\1/;p}' $(SCRIPT))
 
 test:
 	cd test && ./run_test.sh
