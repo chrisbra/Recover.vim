@@ -156,7 +156,7 @@ fu! recover#BalloonExprRecover() "{{{1
 endfun
 
 doc/recoverPlugin.txt	[[[1
-70
+85
 *recover.vim*   Show differences for recovered files
 
 Author:  Christian Brabandt <cb@256bit.org>
@@ -173,7 +173,8 @@ Copyright: (c) 2009, 2010 by Christian Brabandt
 
         1.  Contents.....................................: |recoverPlugin|
         2.  recover Manual...............................: |recover-manual|
-        3.  recover History..............................: |recover-history|
+        3.  recover Feedback.............................: |recover-Feedback|
+        4.  recover History..............................: |recover-history|
 
 ==============================================================================
 2. recover Manual                                       *recover-manual*
@@ -208,7 +209,21 @@ have a filename (|:f|) of something like 'original file (on disk-version)'. If
 you want to save that version, use |:saveas|.
 
 ==============================================================================
-3. recover History                                          *recover-history*
+3. ChangesPlugin Feedback                                   *recover-feedback*
+
+Feedback is always welcome. If you like the plugin, please rate it at the
+vim-page:
+http://www.vim.org/scripts/script.php?script_id=3068
+
+You can also follow the development of the plugin at github:
+http://github.com/chrisbra/Recover.vim
+
+Please don't hesitate to report any bugs to the maintainer, mentioned in the
+third line of this document.
+
+==============================================================================
+4. recover History                                          *recover-history*
+        0.6:                    : |recover-feedback|
         0.5: May 04, 2010       :0r command in recover plugin adds extra \n
                                   Patch by Sergey Khorev (Thanks!)
                                 : generate help file with 'et' set, so the 
