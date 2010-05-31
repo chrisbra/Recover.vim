@@ -37,7 +37,7 @@ unlet s:keepcpo
 " Modeline {{{1
 " vim: fdm=marker sw=2 sts=2 ts=8 fdl=0
 autoload/recover.vim	[[[1
-137
+141
 " Vim plugin for diffing when swap file was found
 " ---------------------------------------------------------------
 " Author: Christian Brabandt <cb@256bit.org>
@@ -128,17 +128,21 @@ fu! recover#DiffRecoveredFile() "{{{1
 	call feedkeys(":0r #\n")
 	call feedkeys(":$delete _\n")
 	if l:filetype != ""
-		call feedkeys(":setl filetype=".l:filetype."\n")
+	    call feedkeys(":setl filetype=".l:filetype."\n")
 	endif
 	call feedkeys(":f! " . escape(expand("<afile>")," ") . "\\ (on-disk\\ version)\n")
 	call feedkeys(":diffthis\n")
 	call feedkeys(":setl noswapfile buftype=nowrite bufhidden=delete nobuflisted\n")
 	call feedkeys(":let b:mod='unmodified version on-disk'\n")
-	call feedkeys(":wincmd p\n")
+	call feedkeys(":exe bufwinnr(g:recover_bufnr) ' wincmd w'"."\n")
+	"call feedkeys(":wincmd p\n")
 	call feedkeys(":command! -buffer DeleteSwapFile :call delete(b:swapname)\n")
 	call feedkeys(":0\n")
 	call feedkeys(':if has("balloon_eval")|:set ballooneval|set bexpr=recover#BalloonExprRecover()|endif'."\n")
 	"call feedkeys(":redraw!\n")
+	if !exists("b:swapname")
+	    call feedkeys(":wincmd p\n")
+	endif
 	call feedkeys(":echo 'Found Swapfile '.b:swapname . ', showing diff!'\n")
 	" Delete Autocommand
 	call recover#AutoCmdBRP(0)

@@ -94,7 +94,7 @@ fu! recover#DiffRecoveredFile() "{{{1
 	call feedkeys(":diffthis\n")
 	call feedkeys(":setl noswapfile buftype=nowrite bufhidden=delete nobuflisted\n")
 	call feedkeys(":let b:mod='unmodified version on-disk'\n")
-	call feedkeys(":wincmd p\n")
+	call feedkeys(":exe bufwinnr(g:recover_bufnr) ' wincmd w'"."\n")
 	call feedkeys(":command! -buffer DeleteSwapFile :call delete(b:swapname)\n")
 	call feedkeys(":0\n")
 	call feedkeys(':if has("balloon_eval")|:set ballooneval|set bexpr=recover#BalloonExprRecover()|endif'."\n")
