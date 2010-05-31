@@ -1,11 +1,11 @@
 " Vim plugin for diffing when swap file was found
 " ---------------------------------------------------------------
 " Author: Christian Brabandt <cb@256bit.org>
-" Version: 0.5
-" Last Change: Tue, 04 May 2010 21:50:46 +0200
+" Version: 0.6
+" Last Change: Mon, 31 May 2010 22:39:40 +0200
 " Script:  http://www.vim.org/scripts/script.php?script_id=3068
 " License: VIM License
-" GetLatestVimScripts: 3068 3 :AutoInstall: recover.vim
+" GetLatestVimScripts: 3068 4 :AutoInstall: recover.vim
 "
 fu! recover#Recover(on) "{{{1
     if a:on
@@ -18,7 +18,8 @@ fu! recover#Recover(on) "{{{1
 	    " The check for l:ro won't be needed, since the SwapExists
 	    " auto-command won't fire anyway, if the buffer is not modifiable.
 	    "au SwapExists * :if !(&l:ro)|let v:swapchoice='r'|let b:swapname=v:swapname|call recover#AutoCmdBRP(1)|endif
-	    au SwapExists * let v:swapchoice='r'|let b:swapname=v:swapname|call recover#AutoCmdBRP(1)
+	    "au SwapExists * let v:swapchoice='r'|let b:swapname=v:swapname|call recover#AutoCmdBRP(1)
+	    au SwapExists * call recover#ConfirmSwapDiff()
 	augroup END
     else
 	augroup Swap
@@ -32,6 +33,25 @@ fu! recover#Recover(on) "{{{1
     endif
     "echo "RecoverPlugin" (a:on ? "Enabled" : "Disabled")
 endfu
+
+fu! recover#SwapFoundComplete(A,L,P) "{{{1
+    return "Yes\nNo"
+endfu
+
+fu! recover#ConfirmSwapDiff() "{{{1
+	call inputsave()
+	if has("gui_running")
+	   let p = inputdialog("Swap File found: Diff buffer? ", "Yes", "No")
+	else
+	   let p = input("Swap File found: Diff buffer? ", "Yes", "custom,recover#SwapFoundComplete")
+	endif
+	call inputrestore()
+	if p =~? '^y\%[es]$'
+	    let v:swapchoice='r'
+	    let b:swapname=v:swapname
+	    call recover#AutoCmdBRP(1)
+	endif
+endfun
 
 fu! recover#AutoCmdBRP(on) "{{{1
     if a:on
@@ -55,29 +75,31 @@ fu! recover#AutoCmdBRP(on) "{{{1
     endif
 endfu
 
+
 fu! recover#DiffRecoveredFile() "{{{1
 	" For some reason, this only works with feedkeys.
 	" I am not sure  why.
-	call feedkeys(":diffthis\n", "t")
-	call feedkeys(":setl modified\n", "t")
-	call feedkeys(":let b:mod='recovered version'\n", "t")
-	call feedkeys(":let g:recover_bufnr=bufnr('%')\n", "t")
-        let l:filetype = &ft
-	call feedkeys(":vert new\n", "t")
-	call feedkeys(":0r #\n", "t")
-        call feedkeys(":$delete _\n", "t")
-        if l:filetype != ""
-                call feedkeys(":setl filetype=".l:filetype."\n", "t")
-        endif
-	call feedkeys(":f! " . escape(expand("<afile>")," ") . "\\ (on-disk\\ version)\n", "t")
-	call feedkeys(":diffthis\n", "t")
-	call feedkeys(":set bt=nowrite\n", "t")
-	call feedkeys(":let b:mod='unmodified version on-disk'\n", "t")
-	call feedkeys(":wincmd p\n","t")
-	call feedkeys(":0\n","t")
-	call feedkeys(':if has("balloon_eval")|:set ballooneval|set bexpr=recover#BalloonExprRecover()|endif'."\n", 't')
-	"call feedkeys(":redraw!\n", "t")
-	call feedkeys(":echo 'Found Swapfile '.b:swapname . ', showing diff!'\n", "t")
+	call feedkeys(":diffthis\n")
+	call feedkeys(":setl modified\n")
+	call feedkeys(":let b:mod='recovered version'\n")
+	call feedkeys(":let g:recover_bufnr=bufnr('%')\n")
+	let l:filetype = &ft
+	call feedkeys(":vert new\n")
+	call feedkeys(":0r #\n")
+	call feedkeys(":$delete _\n")
+	if l:filetype != ""
+		call feedkeys(":setl filetype=".l:filetype."\n")
+	endif
+	call feedkeys(":f! " . escape(expand("<afile>")," ") . "\\ (on-disk\\ version)\n")
+	call feedkeys(":diffthis\n")
+	call feedkeys(":setl noswapfile buftype=nowrite bufhidden=delete nobuflisted\n")
+	call feedkeys(":let b:mod='unmodified version on-disk'\n")
+	call feedkeys(":wincmd p\n")
+	call feedkeys(":command! -buffer DeleteSwapFile :call delete(b:swapname)\n")
+	call feedkeys(":0\n")
+	call feedkeys(':if has("balloon_eval")|:set ballooneval|set bexpr=recover#BalloonExprRecover()|endif'."\n")
+	"call feedkeys(":redraw!\n")
+	call feedkeys(":echo 'Found Swapfile '.b:swapname . ', showing diff!'\n")
 	" Delete Autocommand
 	call recover#AutoCmdBRP(0)
     "endif

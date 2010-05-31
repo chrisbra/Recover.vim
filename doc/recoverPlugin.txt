@@ -1,7 +1,7 @@
 *recover.vim*   Show differences for recovered files
 
 Author:  Christian Brabandt <cb@256bit.org>
-Version: 0.5 Tue, 04 May 2010 21:50:46 +0200
+Version: 0.6 Mon, 31 May 2010 22:39:40 +0200
 
 Copyright: (c) 2009, 2010 by Christian Brabandt         
            The VIM LICENSE applies to recoverPlugin.vim and recoverPlugin.txt
@@ -25,7 +25,7 @@ Functionality
 When using |recovery|, it is hard to tell, what has been changed between the
 recovered file and the actual on disk version. The aim of this plugin is, to
 have an easy way to see differences, between the recovered files and the files
-restored on disk.
+stored on disk.
 
 Therefore this plugin sets up an auto command, that will create a diff buffer
 between the recovered file and the on-disk version of the same file. You can
@@ -37,6 +37,25 @@ By default this plugin is enabled. To disable it, use >
 
 To enable this plugin again, use >
     :RecoverPluginEnable
+
+When you open a file and vim detects, that an |swap-file| already exists for a
+buffer, the plugin will ask you, if you'd like to see a diff of both versions
+using |vimdiff|. In the dialog answer 'Yes' to open the file and display a
+diff version or 'No' to open the file normally.
+
+If you have said 'Yes', the plugin opens a new vertical splitt buffer. On the
+left side, you'll find the file as it is stored on disk and the right side
+will contain your recovered version of the file (using the found swap file).
+
+You can now use the |merge| commands to copy the contents to the buffer that
+holds your recovered version. If you are finished, you can close the diff
+version and close the window, by issuing |:diffoff!| and |:close| in the
+window, that contains the on-disk version of the file. Be sure to save the
+recovered version of you file and afterwards you can safely remove the swap
+file. In the recovered window, the command >
+    :DeleteSwapFile
+<
+to delete the swapfile, that was used to create the diff window.
 
 If your Vim was built with |+balloon_eval|, recover.vim will also set up an
 balloon expression, that shows you, which buffer contains the recovered
@@ -64,7 +83,14 @@ third line of this document.
 
 ==============================================================================
 4. recover History                                          *recover-history*
-        0.6:                    : |recover-feedback|
+        0.6: May 31, 2010       : |recover-feedback|
+                                : Ask to really open a diff buffer for a 
+                                  file (suggestion: David Fishburn, thanks!)
+                                : DeleteSwapFile to delete the swap file, that
+                                  was used to create the diff buffer
+                                : change feedkeys(...,'t') to feedkeys('..')
+                                  so that not every command appears in the
+                                  history.
         0.5: May 04, 2010       :0r command in recover plugin adds extra \n
                                   Patch by Sergey Khorev (Thanks!)
                                 : generate help file with 'et' set, so the 
