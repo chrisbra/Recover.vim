@@ -38,7 +38,7 @@ unlet s:keepcpo
 " Modeline {{{1
 " vim: fdm=marker sw=2 sts=2 ts=8 fdl=0
 autoload/recover.vim	[[[1
-116
+117
 " Vim plugin for diffing when swap file was found
 " ---------------------------------------------------------------
 " Author: Christian Brabandt <cb@256bit.org>
@@ -46,7 +46,7 @@ autoload/recover.vim	[[[1
 " Last Change: Tue, 04 May 2010 21:50:46 +0200
 
 
-" Script:  Not Yet
+" Script:  http://www.vim.org/scripts/script.php?script_id=2709
 " License: VIM License
 " GetLatestVimScripts: 3068 3 :AutoInstall: recover.vim
 "
@@ -117,6 +117,7 @@ fu! recover#DiffRecoveredFile() "{{{1
 	call feedkeys(":set bt=nowrite\n", "t")
 	call feedkeys(":let b:mod='unmodified version on-disk'\n", "t")
 	call feedkeys(":wincmd p\n","t")
+	call feedkeys(":0\n","t")
 	call feedkeys(':if has("balloon_eval")|:set ballooneval|set bexpr=recover#BalloonExprRecover()|endif'."\n", 't')
 	"call feedkeys(":redraw!\n", "t")
 	call feedkeys(":echo 'Found Swapfile '.b:swapname . ', showing diff!'\n", "t")
@@ -173,7 +174,7 @@ Copyright: (c) 2009, 2010 by Christian Brabandt
 
         1.  Contents.....................................: |recoverPlugin|
         2.  recover Manual...............................: |recover-manual|
-        3.  recover Feedback.............................: |recover-Feedback|
+        3.  recover Feedback.............................: |recover-feedback|
         4.  recover History..............................: |recover-history|
 
 ==============================================================================
