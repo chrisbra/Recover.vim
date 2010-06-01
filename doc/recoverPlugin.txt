@@ -55,7 +55,7 @@ recovered version of you file and afterwards you can safely remove the swap
 file. In the recovered window, the command >
     :DeleteSwapFile
 <
-to delete the swapfile, that was used to create the diff window.
+to delete the swapfile and finishes everything up.
 
 If your Vim was built with |+balloon_eval|, recover.vim will also set up an
 balloon expression, that shows you, which buffer contains the recovered
@@ -83,6 +83,8 @@ third line of this document.
 
 ==============================================================================
 4. recover History                                          *recover-history*
+        0.7: Jun 01, 2010       : DeleteSwapFile closes the diff-window and
+                                  cleans everything up
         0.6: May 31, 2010       : |recover-feedback|
                                 : Ask to really open a diff buffer for a 
                                   file (suggestion: David Fishburn, thanks!)
