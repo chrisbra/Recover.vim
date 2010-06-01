@@ -4,12 +4,12 @@ finish
 plugin/recover.vim	[[[1
 33
 " Vim plugin for diffing when swap file was found
-" Last Change: Tue, 01 Jun 2010 20:21:39 +0200
-" Version: 0.7
+" Last Change: Tue, 01 Jun 2010 20:48:15 +0200
+" Version: 0.8
 " Author: Christian Brabandt <cb@256bit.org>
 " Script:  http://www.vim.org/scripts/script.php?script_id=3068 
 " License: VIM License
-" GetLatestVimScripts: 3068 5 :AutoInstall: recover.vim
+" GetLatestVimScripts: 3068 6 :AutoInstall: recover.vim
 " Documentation: see :h recoverPlugin.txt
 
 " ---------------------------------------------------------------------
@@ -37,15 +37,15 @@ unlet s:keepcpo
 " Modeline {{{1
 " vim: fdm=marker sw=2 sts=2 ts=8 fdl=0
 autoload/recover.vim	[[[1
-146
+150
 " Vim plugin for diffing when swap file was found
 " ---------------------------------------------------------------
 " Author: Christian Brabandt <cb@256bit.org>
-" Version: 0.7
-" Last Change: Tue, 01 Jun 2010 20:21:39 +0200
+" Version: 0.8
+" Last Change: Tue, 01 Jun 2010 20:48:15 +0200
 " Script:  http://www.vim.org/scripts/script.php?script_id=3068
 " License: VIM License
-" GetLatestVimScripts: 3068 5 :AutoInstall: recover.vim
+" GetLatestVimScripts: 3068 6 :AutoInstall: recover.vim
 "
 fu! recover#Recover(on) "{{{1
     if a:on
@@ -131,10 +131,12 @@ fu! recover#DiffRecoveredFile() "{{{1
 		call feedkeys(":setl filetype=".l:filetype."\n")
 	endif
 	call feedkeys(":f! " . escape(expand("<afile>")," ") . "\\ (on-disk\\ version)\n")
+	call feedkeys(":let swapbufnr = bufnr('')\n")
 	call feedkeys(":diffthis\n")
 	call feedkeys(":setl noswapfile buftype=nowrite bufhidden=delete nobuflisted\n")
 	call feedkeys(":let b:mod='unmodified version on-disk'\n")
 	call feedkeys(":exe bufwinnr(g:recover_bufnr) ' wincmd w'"."\n")
+	call feedkeys(":let b:swapbufnr=swapbufnr\n")
 	"call feedkeys(":command! -buffer DeleteSwapFile :call delete(b:swapname)|delcommand DeleteSwapFile\n")
 	call feedkeys(":command! -buffer FinishRecovery :call recover#RecoverFinish()\n")
 	call feedkeys(":0\n")
@@ -178,18 +180,20 @@ endfun
 
 fu! recover#RecoverFinish() abort "{{{1
     diffoff
-    exe bufwinnr(b:swapname) " wincmd w"
+    exe bufwinnr(b:swapbufnr) " wincmd w"
     diffoff
     bd!
     call delete(b:swapname)
     delcommand FinishRecovery
 endfun
+
+" vim:fdl=0
 doc/recoverPlugin.txt	[[[1
-116
+117
 *recover.vim*   Show differences for recovered files
 
 Author:  Christian Brabandt <cb@256bit.org>
-Version: 0.7 Tue, 01 Jun 2010 20:21:39 +0200
+Version: 0.8 Tue, 01 Jun 2010 20:48:15 +0200
 
 Copyright: (c) 2009, 2010 by Christian Brabandt         
            The VIM LICENSE applies to recoverPlugin.vim and recoverPlugin.txt
@@ -273,6 +277,7 @@ third line of this document.
 
 ==============================================================================
 4. recover History                                          *recover-history*
+        0.8: Jun 01, 2010       : make :FinishRecovery more robust
         0.7: Jun 01, 2010       : |FinishRecovery| closes the diff-window and
                                   cleans everything up
                                 : :DeleteSwapFile is not needed anymore

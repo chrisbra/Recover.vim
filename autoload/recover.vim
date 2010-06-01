@@ -1,11 +1,11 @@
 " Vim plugin for diffing when swap file was found
 " ---------------------------------------------------------------
 " Author: Christian Brabandt <cb@256bit.org>
-" Version: 0.7
-" Last Change: Tue, 01 Jun 2010 20:21:39 +0200
+" Version: 0.8
+" Last Change: Tue, 01 Jun 2010 20:48:15 +0200
 " Script:  http://www.vim.org/scripts/script.php?script_id=3068
 " License: VIM License
-" GetLatestVimScripts: 3068 5 :AutoInstall: recover.vim
+" GetLatestVimScripts: 3068 6 :AutoInstall: recover.vim
 "
 fu! recover#Recover(on) "{{{1
     if a:on
@@ -91,10 +91,12 @@ fu! recover#DiffRecoveredFile() "{{{1
 		call feedkeys(":setl filetype=".l:filetype."\n")
 	endif
 	call feedkeys(":f! " . escape(expand("<afile>")," ") . "\\ (on-disk\\ version)\n")
+	call feedkeys(":let swapbufnr = bufnr('')\n")
 	call feedkeys(":diffthis\n")
 	call feedkeys(":setl noswapfile buftype=nowrite bufhidden=delete nobuflisted\n")
 	call feedkeys(":let b:mod='unmodified version on-disk'\n")
 	call feedkeys(":exe bufwinnr(g:recover_bufnr) ' wincmd w'"."\n")
+	call feedkeys(":let b:swapbufnr=swapbufnr\n")
 	"call feedkeys(":command! -buffer DeleteSwapFile :call delete(b:swapname)|delcommand DeleteSwapFile\n")
 	call feedkeys(":command! -buffer FinishRecovery :call recover#RecoverFinish()\n")
 	call feedkeys(":0\n")
@@ -138,9 +140,11 @@ endfun
 
 fu! recover#RecoverFinish() abort "{{{1
     diffoff
-    exe bufwinnr(b:swapname) " wincmd w"
+    exe bufwinnr(b:swapbufnr) " wincmd w"
     diffoff
     bd!
     call delete(b:swapname)
     delcommand FinishRecovery
 endfun
+
+" vim:fdl=0
