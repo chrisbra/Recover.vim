@@ -52,10 +52,12 @@ holds your recovered version. If you are finished, you can close the diff
 version and close the window, by issuing |:diffoff!| and |:close| in the
 window, that contains the on-disk version of the file. Be sure to save the
 recovered version of you file and afterwards you can safely remove the swap
-file. In the recovered window, the command >
-    :DeleteSwapFile
+file.
+                                                          *FinishRecovery*
+In the recovered window, the command >
+    :FinishRecovery
 <
-to delete the swapfile and finishes everything up.
+deletes the swapfile closes the diff window  and finishes everything up.
 
 If your Vim was built with |+balloon_eval|, recover.vim will also set up an
 balloon expression, that shows you, which buffer contains the recovered
@@ -83,8 +85,9 @@ third line of this document.
 
 ==============================================================================
 4. recover History                                          *recover-history*
-        0.7: Jun 01, 2010       : DeleteSwapFile closes the diff-window and
+        0.7: Jun 01, 2010       : |FinishRecovery| closes the diff-window and
                                   cleans everything up
+                                : :DeleteSwapFile is not needed anymore
         0.6: May 31, 2010       : |recover-feedback|
                                 : Ask to really open a diff buffer for a 
                                   file (suggestion: David Fishburn, thanks!)

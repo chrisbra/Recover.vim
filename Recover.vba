@@ -37,7 +37,7 @@ unlet s:keepcpo
 " Modeline {{{1
 " vim: fdm=marker sw=2 sts=2 ts=8 fdl=0
 autoload/recover.vim	[[[1
-141
+146
 " Vim plugin for diffing when swap file was found
 " ---------------------------------------------------------------
 " Author: Christian Brabandt <cb@256bit.org>
@@ -128,21 +128,18 @@ fu! recover#DiffRecoveredFile() "{{{1
 	call feedkeys(":0r #\n")
 	call feedkeys(":$delete _\n")
 	if l:filetype != ""
-	    call feedkeys(":setl filetype=".l:filetype."\n")
+		call feedkeys(":setl filetype=".l:filetype."\n")
 	endif
 	call feedkeys(":f! " . escape(expand("<afile>")," ") . "\\ (on-disk\\ version)\n")
 	call feedkeys(":diffthis\n")
 	call feedkeys(":setl noswapfile buftype=nowrite bufhidden=delete nobuflisted\n")
 	call feedkeys(":let b:mod='unmodified version on-disk'\n")
 	call feedkeys(":exe bufwinnr(g:recover_bufnr) ' wincmd w'"."\n")
-	"call feedkeys(":wincmd p\n")
-	call feedkeys(":command! -buffer DeleteSwapFile :call delete(b:swapname)\n")
+	"call feedkeys(":command! -buffer DeleteSwapFile :call delete(b:swapname)|delcommand DeleteSwapFile\n")
+	call feedkeys(":command! -buffer FinishRecovery :call recover#RecoverFinish()\n")
 	call feedkeys(":0\n")
 	call feedkeys(':if has("balloon_eval")|:set ballooneval|set bexpr=recover#BalloonExprRecover()|endif'."\n")
 	"call feedkeys(":redraw!\n")
-	if !exists("b:swapname")
-	    call feedkeys(":wincmd p\n")
-	endif
 	call feedkeys(":echo 'Found Swapfile '.b:swapname . ', showing diff!'\n")
 	" Delete Autocommand
 	call recover#AutoCmdBRP(0)
@@ -179,8 +176,16 @@ fu! recover#BalloonExprRecover() "{{{1
     endif
 endfun
 
+fu! recover#RecoverFinish() abort "{{{1
+    diffoff
+    exe bufwinnr(b:swapname) " wincmd w"
+    diffoff
+    bd!
+    call delete(b:swapname)
+    delcommand FinishRecovery
+endfun
 doc/recoverPlugin.txt	[[[1
-111
+113
 *recover.vim*   Show differences for recovered files
 
 Author:  Christian Brabandt <cb@256bit.org>
@@ -238,7 +243,7 @@ recovered version of you file and afterwards you can safely remove the swap
 file. In the recovered window, the command >
     :DeleteSwapFile
 <
-to delete the swapfile, that was used to create the diff window.
+to delete the swapfile and finishes everything up.
 
 If your Vim was built with |+balloon_eval|, recover.vim will also set up an
 balloon expression, that shows you, which buffer contains the recovered
@@ -266,6 +271,8 @@ third line of this document.
 
 ==============================================================================
 4. recover History                                          *recover-history*
+        0.7: Jun 01, 2010       : DeleteSwapFile closes the diff-window and
+                                  cleans everything up
         0.6: May 31, 2010       : |recover-feedback|
                                 : Ask to really open a diff buffer for a 
                                   file (suggestion: David Fishburn, thanks!)

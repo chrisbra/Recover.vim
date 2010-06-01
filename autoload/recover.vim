@@ -96,7 +96,7 @@ fu! recover#DiffRecoveredFile() "{{{1
 	call feedkeys(":let b:mod='unmodified version on-disk'\n")
 	call feedkeys(":exe bufwinnr(g:recover_bufnr) ' wincmd w'"."\n")
 	"call feedkeys(":command! -buffer DeleteSwapFile :call delete(b:swapname)|delcommand DeleteSwapFile\n")
-	call feedkeys(":command! -buffer DeleteSwapFile :call s:RecoverFinish()\n")
+	call feedkeys(":command! -buffer FinishRecovery :call recover#RecoverFinish()\n")
 	call feedkeys(":0\n")
 	call feedkeys(':if has("balloon_eval")|:set ballooneval|set bexpr=recover#BalloonExprRecover()|endif'."\n")
 	"call feedkeys(":redraw!\n")
@@ -136,10 +136,11 @@ fu! recover#BalloonExprRecover() "{{{1
     endif
 endfun
 
-fu! s:RecoverFinish() abort "{{{1
+fu! recover#RecoverFinish() abort "{{{1
     diffoff
-    exe "call bufwinnr(b:swapname) " wincmd w
+    exe bufwinnr(b:swapname) " wincmd w"
     diffoff
+    bd!
     call delete(b:swapname)
-    delcommand DeleteSwapFiles
+    delcommand FinishRecovery
 endfun
