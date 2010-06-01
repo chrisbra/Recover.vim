@@ -2,7 +2,7 @@
 " ---------------------------------------------------------------
 " Author: Christian Brabandt <cb@256bit.org>
 " Version: 0.8
-" Last Change: Tue, 01 Jun 2010 20:48:15 +0200
+" Last Change: Tue, 01 Jun 2010 20:54:03 +0200
 " Script:  http://www.vim.org/scripts/script.php?script_id=3068
 " License: VIM License
 " GetLatestVimScripts: 3068 6 :AutoInstall: recover.vim

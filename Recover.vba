@@ -4,7 +4,7 @@ finish
 plugin/recover.vim	[[[1
 33
 " Vim plugin for diffing when swap file was found
-" Last Change: Tue, 01 Jun 2010 20:48:15 +0200
+" Last Change: Tue, 01 Jun 2010 20:54:03 +0200
 " Version: 0.8
 " Author: Christian Brabandt <cb@256bit.org>
 " Script:  http://www.vim.org/scripts/script.php?script_id=3068 
@@ -42,7 +42,7 @@ autoload/recover.vim	[[[1
 " ---------------------------------------------------------------
 " Author: Christian Brabandt <cb@256bit.org>
 " Version: 0.8
-" Last Change: Tue, 01 Jun 2010 20:48:15 +0200
+" Last Change: Tue, 01 Jun 2010 20:54:03 +0200
 " Script:  http://www.vim.org/scripts/script.php?script_id=3068
 " License: VIM License
 " GetLatestVimScripts: 3068 6 :AutoInstall: recover.vim
@@ -189,11 +189,11 @@ endfun
 
 " vim:fdl=0
 doc/recoverPlugin.txt	[[[1
-117
+118
 *recover.vim*   Show differences for recovered files
 
 Author:  Christian Brabandt <cb@256bit.org>
-Version: 0.8 Tue, 01 Jun 2010 20:48:15 +0200
+Version: 0.8 Tue, 01 Jun 2010 20:54:03 +0200
 
 Copyright: (c) 2009, 2010 by Christian Brabandt         
            The VIM LICENSE applies to recoverPlugin.vim and recoverPlugin.txt
@@ -279,7 +279,8 @@ third line of this document.
 4. recover History                                          *recover-history*
         0.8: Jun 01, 2010       : make :FinishRecovery more robust
         0.7: Jun 01, 2010       : |FinishRecovery| closes the diff-window and
-                                  cleans everything up
+                                  cleans everything up (suggestion by
+                                  David Fishburn)
                                 : :DeleteSwapFile is not needed anymore
         0.6: May 31, 2010       : |recover-feedback|
                                 : Ask to really open a diff buffer for a 
