@@ -85,6 +85,10 @@ third line of this document.
 
 ==============================================================================
 4. recover History                                          *recover-history*
+        0.9: Jun 01, 2010       : use feedkeys(...,'t') instead of feedkeys()
+                                  (this works more reliable, although it
+                                  pollutes the history), so delete those 
+                                  entries
         0.8: Jun 01, 2010       : make :FinishRecovery more robust
         0.7: Jun 01, 2010       : |FinishRecovery| closes the diff-window and
                                   cleans everything up (suggestion by
