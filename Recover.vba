@@ -4,12 +4,12 @@ finish
 plugin/recover.vim	[[[1
 33
 " Vim plugin for diffing when swap file was found
-" Last Change: Mon, 31 May 2010 22:39:40 +0200
-" Version: 0.6
+" Last Change: Tue, 01 Jun 2010 20:21:39 +0200
+" Version: 0.7
 " Author: Christian Brabandt <cb@256bit.org>
 " Script:  http://www.vim.org/scripts/script.php?script_id=3068 
 " License: VIM License
-" GetLatestVimScripts: 3068 4 :AutoInstall: recover.vim
+" GetLatestVimScripts: 3068 5 :AutoInstall: recover.vim
 " Documentation: see :h recoverPlugin.txt
 
 " ---------------------------------------------------------------------
@@ -41,11 +41,11 @@ autoload/recover.vim	[[[1
 " Vim plugin for diffing when swap file was found
 " ---------------------------------------------------------------
 " Author: Christian Brabandt <cb@256bit.org>
-" Version: 0.6
-" Last Change: Mon, 31 May 2010 22:39:40 +0200
+" Version: 0.7
+" Last Change: Tue, 01 Jun 2010 20:21:39 +0200
 " Script:  http://www.vim.org/scripts/script.php?script_id=3068
 " License: VIM License
-" GetLatestVimScripts: 3068 4 :AutoInstall: recover.vim
+" GetLatestVimScripts: 3068 5 :AutoInstall: recover.vim
 "
 fu! recover#Recover(on) "{{{1
     if a:on
@@ -185,11 +185,11 @@ fu! recover#RecoverFinish() abort "{{{1
     delcommand FinishRecovery
 endfun
 doc/recoverPlugin.txt	[[[1
-113
+116
 *recover.vim*   Show differences for recovered files
 
 Author:  Christian Brabandt <cb@256bit.org>
-Version: 0.6 Mon, 31 May 2010 22:39:40 +0200
+Version: 0.7 Tue, 01 Jun 2010 20:21:39 +0200
 
 Copyright: (c) 2009, 2010 by Christian Brabandt         
            The VIM LICENSE applies to recoverPlugin.vim and recoverPlugin.txt
@@ -240,10 +240,12 @@ holds your recovered version. If you are finished, you can close the diff
 version and close the window, by issuing |:diffoff!| and |:close| in the
 window, that contains the on-disk version of the file. Be sure to save the
 recovered version of you file and afterwards you can safely remove the swap
-file. In the recovered window, the command >
-    :DeleteSwapFile
+file.
+                                                          *FinishRecovery*
+In the recovered window, the command >
+    :FinishRecovery
 <
-to delete the swapfile and finishes everything up.
+deletes the swapfile closes the diff window  and finishes everything up.
 
 If your Vim was built with |+balloon_eval|, recover.vim will also set up an
 balloon expression, that shows you, which buffer contains the recovered
@@ -271,8 +273,9 @@ third line of this document.
 
 ==============================================================================
 4. recover History                                          *recover-history*
-        0.7: Jun 01, 2010       : DeleteSwapFile closes the diff-window and
+        0.7: Jun 01, 2010       : |FinishRecovery| closes the diff-window and
                                   cleans everything up
+                                : :DeleteSwapFile is not needed anymore
         0.6: May 31, 2010       : |recover-feedback|
                                 : Ask to really open a diff buffer for a 
                                   file (suggestion: David Fishburn, thanks!)
