@@ -1,11 +1,11 @@
 " Vim plugin for diffing when swap file was found
 " ---------------------------------------------------------------
 " Author: Christian Brabandt <cb@256bit.org>
-" Version: 0.8
-" Last Change: Tue, 01 Jun 2010 20:54:03 +0200
+" Version: 0.9
+" Last Change: Wed, 02 Jun 2010 19:37:39 +0200
 " Script:  http://www.vim.org/scripts/script.php?script_id=3068
 " License: VIM License
-" GetLatestVimScripts: 3068 6 :AutoInstall: recover.vim
+" GetLatestVimScripts: 3068 7 :AutoInstall: recover.vim
 "
 fu! recover#Recover(on) "{{{1
     if a:on
@@ -99,6 +99,7 @@ fu! recover#DiffRecoveredFile() "{{{1
 	call feedkeys(":exe bufwinnr(g:recover_bufnr) ' wincmd w'"."\n", 't')
 	call feedkeys(":let b:swapbufnr=swapbufnr\n", 't')
 	"call feedkeys(":command! -buffer DeleteSwapFile :call delete(b:swapname)|delcommand DeleteSwapFile\n", 't')
+	call feedkeys(":command! -buffer RecoverPluginFinish :FinishRecovery\n", 't')
 	call feedkeys(":command! -buffer FinishRecovery :call recover#RecoverFinish()\n", 't')
 	call feedkeys(":0\n", 't')
 	if has("balloon_eval")
@@ -106,12 +107,37 @@ fu! recover#DiffRecoveredFile() "{{{1
 	    call feedkeys(":set ballooneval|set bexpr=recover#BalloonExprRecover()\n", 't')
 	endif
 	"call feedkeys(":redraw!\n", 't')
-	call feedkeys(":echo 'Found Swapfile '.b:swapname . ', showing diff!'\n", 't')
 	call feedkeys(":for i in range(".histnr.", histnr('cmd'), 1)|:call histdel('cmd',i)|:endfor\n",'t')
+	call feedkeys(":echo 'Found Swapfile '.b:swapname . ', showing diff!'\n", 't')
 	" Delete Autocommand
 	call recover#AutoCmdBRP(0)
     "endif
 endfu
+
+fu! recover#Help() "{{{1
+    echohl Title
+    echo "Diff key mappings\n".
+    \ "-----------------\n"
+    echo "Normal mode commands:\n"
+    echohl Normal
+    echo "]c - next diff\n".
+    \ "[c - prev diff\n".
+    \ "do - diff obtain - get change from other window\n".
+    \ "dp - diff put    - put change into other window\n"
+    echohl Title
+    echo "Ex-commands:\n"
+    echohl Normal
+    echo ":[range]diffget - get changes from other window\n".
+    \ ":[range]diffput - put changes into other window\n".
+    \ ":RecoverPluginDisable - DisablePlugin\n".
+    \ ":RecoverPluginEnable  - EnablePlugin\n".
+    \ ":RecoverPluginHelp    - this help"
+    if exists(":RecoverPluginFinish")
+	echo ":RecoverPluginFinish  - finish recovery"
+    endif
+endfun
+
+
 
 fu! s:EchoMsg(msg) "{{{1
     echohl WarningMsg

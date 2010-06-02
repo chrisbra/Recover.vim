@@ -2,14 +2,14 @@
 UseVimball
 finish
 plugin/recover.vim	[[[1
-33
+34
 " Vim plugin for diffing when swap file was found
-" Last Change: Tue, 01 Jun 2010 20:54:03 +0200
-" Version: 0.8
+" Last Change: Wed, 02 Jun 2010 19:37:39 +0200
+" Version: 0.9
 " Author: Christian Brabandt <cb@256bit.org>
 " Script:  http://www.vim.org/scripts/script.php?script_id=3068 
 " License: VIM License
-" GetLatestVimScripts: 3068 6 :AutoInstall: recover.vim
+" GetLatestVimScripts: 3068 7 :AutoInstall: recover.vim
 " Documentation: see :h recoverPlugin.txt
 
 " ---------------------------------------------------------------------
@@ -28,6 +28,7 @@ call recover#Recover(1)
 
 com! RecoverPluginEnable :call recover#Recover(1)
 com! RecoverPluginDisable :call recover#Recover(0)
+com! RecoverPluginHelp   :call recover#Help()
 
 " =====================================================================
 " Restoration And Modelines: {{{1
@@ -37,15 +38,15 @@ unlet s:keepcpo
 " Modeline {{{1
 " vim: fdm=marker sw=2 sts=2 ts=8 fdl=0
 autoload/recover.vim	[[[1
-160
+186
 " Vim plugin for diffing when swap file was found
 " ---------------------------------------------------------------
 " Author: Christian Brabandt <cb@256bit.org>
-" Version: 0.8
-" Last Change: Tue, 01 Jun 2010 20:54:03 +0200
+" Version: 0.9
+" Last Change: Wed, 02 Jun 2010 19:37:39 +0200
 " Script:  http://www.vim.org/scripts/script.php?script_id=3068
 " License: VIM License
-" GetLatestVimScripts: 3068 6 :AutoInstall: recover.vim
+" GetLatestVimScripts: 3068 7 :AutoInstall: recover.vim
 "
 fu! recover#Recover(on) "{{{1
     if a:on
@@ -139,6 +140,7 @@ fu! recover#DiffRecoveredFile() "{{{1
 	call feedkeys(":exe bufwinnr(g:recover_bufnr) ' wincmd w'"."\n", 't')
 	call feedkeys(":let b:swapbufnr=swapbufnr\n", 't')
 	"call feedkeys(":command! -buffer DeleteSwapFile :call delete(b:swapname)|delcommand DeleteSwapFile\n", 't')
+	call feedkeys(":command! -buffer RecoverPluginFinish :FinishRecovery\n", 't')
 	call feedkeys(":command! -buffer FinishRecovery :call recover#RecoverFinish()\n", 't')
 	call feedkeys(":0\n", 't')
 	if has("balloon_eval")
@@ -146,12 +148,37 @@ fu! recover#DiffRecoveredFile() "{{{1
 	    call feedkeys(":set ballooneval|set bexpr=recover#BalloonExprRecover()\n", 't')
 	endif
 	"call feedkeys(":redraw!\n", 't')
-	call feedkeys(":echo 'Found Swapfile '.b:swapname . ', showing diff!'\n", 't')
 	call feedkeys(":for i in range(".histnr.", histnr('cmd'), 1)|:call histdel('cmd',i)|:endfor\n",'t')
+	call feedkeys(":echo 'Found Swapfile '.b:swapname . ', showing diff!'\n", 't')
 	" Delete Autocommand
 	call recover#AutoCmdBRP(0)
     "endif
 endfu
+
+fu! recover#Help() "{{{1
+    echohl Title
+    echo "Diff key mappings\n".
+    \ "-----------------\n"
+    echo "Normal mode commands:\n"
+    echohl Normal
+    echo "]c - next diff\n".
+    \ "[c - prev diff\n".
+    \ "do - diff obtain - get change from other window\n".
+    \ "dp - diff put    - put change into other window\n"
+    echohl Title
+    echo "Ex-commands:\n"
+    echohl Normal
+    echo ":[range]diffget - get changes from other window\n".
+    \ ":[range]diffput - put changes into other window\n".
+    \ ":RecoverPluginDisable - DisablePlugin\n".
+    \ ":RecoverPluginEnable  - EnablePlugin\n".
+    \ ":RecoverPluginHelp    - this help"
+    if exists(":RecoverPluginFinish")
+	echo ":RecoverPluginFinish  - finish recovery"
+    endif
+endfun
+
+
 
 fu! s:EchoMsg(msg) "{{{1
     echohl WarningMsg
@@ -199,11 +226,11 @@ endfun
 
 " vim:fdl=0
 doc/recoverPlugin.txt	[[[1
-122
+140
 *recover.vim*   Show differences for recovered files
 
 Author:  Christian Brabandt <cb@256bit.org>
-Version: 0.8 Tue, 01 Jun 2010 20:54:03 +0200
+Version: 0.9 Wed, 02 Jun 2010 19:37:39 +0200
 
 Copyright: (c) 2009, 2010 by Christian Brabandt         
            The VIM LICENSE applies to recoverPlugin.vim and recoverPlugin.txt
@@ -220,7 +247,7 @@ Copyright: (c) 2009, 2010 by Christian Brabandt
         4.  recover History..............................: |recover-history|
 
 ==============================================================================
-2. recover Manual                                       *recover-manual*
+2. RecoverPlugin Manual                                       *recover-manual*
 
 Functionality
 
@@ -236,10 +263,10 @@ file on disk.
 
 By default this plugin is enabled. To disable it, use >
     :RecoverPluginDisable
-
+<
 To enable this plugin again, use >
     :RecoverPluginEnable
-
+<
 When you open a file and vim detects, that an |swap-file| already exists for a
 buffer, the plugin will ask you, if you'd like to see a diff of both versions
 using |vimdiff|. In the dialog answer 'Yes' to open the file and display a
@@ -255,11 +282,24 @@ version and close the window, by issuing |:diffoff!| and |:close| in the
 window, that contains the on-disk version of the file. Be sure to save the
 recovered version of you file and afterwards you can safely remove the swap
 file.
-                                                          *FinishRecovery*
+                                        *RecoverPluginFinish* *FinishRecovery*
 In the recovered window, the command >
     :FinishRecovery
 <
-deletes the swapfile closes the diff window  and finishes everything up.
+deletes the swapfile closes the diff window and finishes everything up.
+
+Alternatively you can also use the command >
+    :RecoveryPluginFinish
+<
+
+                                                        *RecoverPluginHelp*
+The command >
+    :RecoverPluginHelp
+<
+show a small message, on what keys can be used to move to the next different
+region and how to merge the changes from one windo into the other.
+
+                                                        *RecoverPlugin-misc*
 
 If your Vim was built with |+balloon_eval|, recover.vim will also set up an
 balloon expression, that shows you, which buffer contains the recovered
@@ -287,10 +327,15 @@ third line of this document.
 
 ==============================================================================
 4. recover History                                          *recover-history*
-        0.9: Jun 01, 2010       : use feedkeys(...,'t') instead of feedkeys()
+        0.9: Jun 02, 2010       : use feedkeys(...,'t') instead of feedkeys()
                                   (this works more reliable, although it
                                   pollutes the history), so delete those 
-                                  entries
+                                  spurious history entries
+                                : |RecoverPluginHelp| shows a small help
+                                  message, about diff commands (suggested by
+                                  David Fishburn, thanks!)
+                                : |RecoverPluginFinish| is a shortcut for
+                                  |FinishRecovery|
         0.8: Jun 01, 2010       : make :FinishRecovery more robust
         0.7: Jun 01, 2010       : |FinishRecovery| closes the diff-window and
                                   cleans everything up (suggestion by
