@@ -41,7 +41,7 @@ endfu
 fu! recover#ConfirmSwapDiff() "{{{1
 	call inputsave()
 	if has("gui_running")
-	   let p = inputdialog("Swap File found: Diff buffer? ", "Yes", "No")
+	   let p = inputdialog("Swap File found: Diff buffer? ", "&Ok\n&Cancel")
 	else
 	   let p = input("Swap File found: Diff buffer? ", "Yes", "custom,recover#SwapFoundComplete")
 	endif
