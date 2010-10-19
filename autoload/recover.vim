@@ -40,7 +40,7 @@ endfu
 
 fu! recover#ConfirmSwapDiff() "{{{1
 	call inputsave()
-	let p = confirm("Swap File found: Diff buffer? ", "&Ok\n&Cancel")
+	let p = confirm("Swap File found: Diff buffer? ", "&Yes\n&No")
 	call inputrestore()
 	if p == 1
 	    let v:swapchoice='r'
