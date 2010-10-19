@@ -40,13 +40,9 @@ endfu
 
 fu! recover#ConfirmSwapDiff() "{{{1
 	call inputsave()
-	if has("gui_running")
-	   let p = inputdialog("Swap File found: Diff buffer? ", "&Ok\n&Cancel")
-	else
-	   let p = input("Swap File found: Diff buffer? ", "Yes", "custom,recover#SwapFoundComplete")
-	endif
+	let p = confirm("Swap File found: Diff buffer? ", "&Ok\n&Cancel")
 	call inputrestore()
-	if p =~? '^y\%[es]$'
+	if p == 1
 	    let v:swapchoice='r'
 	    let b:swapname=v:swapname
 	    call recover#AutoCmdBRP(1)
