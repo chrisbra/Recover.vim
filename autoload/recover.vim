@@ -72,6 +72,7 @@ fu! recover#AutoCmdBRP(on) "{{{1
 	    augroup SwapBRP
 	    au!
 	    augroup END
+	    augroup! SwapBRP
     endif
 endfu
 
