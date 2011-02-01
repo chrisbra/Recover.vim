@@ -84,7 +84,7 @@ have a filename (|:f|) of something like 'original file (on disk-version)'. If
 you want to save that version, use |:saveas|.
 
 ==============================================================================
-3. ChangesPlugin Feedback                                   *recover-feedback*
+3. Plugin Feedback                                        *recover-feedback*
 
 Feedback is always welcome. If you like the plugin, please rate it at the
 vim-page:
@@ -98,6 +98,7 @@ third line of this document.
 
 ==============================================================================
 4. recover History                                          *recover-history*
+        0.10: (unreleased)      : minor documentation update
         0.9: Jun 02, 2010       : use feedkeys(...,'t') instead of feedkeys()
                                   (this works more reliable, although it
                                   pollutes the history), so delete those 

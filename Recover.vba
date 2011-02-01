@@ -38,7 +38,7 @@ unlet s:keepcpo
 " Modeline {{{1
 " vim: fdm=marker sw=2 sts=2 ts=8 fdl=0
 autoload/recover.vim	[[[1
-186
+187
 " Vim plugin for diffing when swap file was found
 " ---------------------------------------------------------------
 " Author: Christian Brabandt <cb@256bit.org>
@@ -113,6 +113,7 @@ fu! recover#AutoCmdBRP(on) "{{{1
 	    augroup SwapBRP
 	    au!
 	    augroup END
+	    augroup! SwapBRP
     endif
 endfu
 
@@ -226,7 +227,7 @@ endfun
 
 " vim:fdl=0
 doc/recoverPlugin.txt	[[[1
-140
+141
 *recover.vim*   Show differences for recovered files
 
 Author:  Christian Brabandt <cb@256bit.org>
@@ -313,7 +314,7 @@ have a filename (|:f|) of something like 'original file (on disk-version)'. If
 you want to save that version, use |:saveas|.
 
 ==============================================================================
-3. ChangesPlugin Feedback                                   *recover-feedback*
+3. Plugin Feedback                                        *recover-feedback*
 
 Feedback is always welcome. If you like the plugin, please rate it at the
 vim-page:
@@ -327,6 +328,7 @@ third line of this document.
 
 ==============================================================================
 4. recover History                                          *recover-history*
+        0.10: (unreleased)      : minor documentation update
         0.9: Jun 02, 2010       : use feedkeys(...,'t') instead of feedkeys()
                                   (this works more reliable, although it
                                   pollutes the history), so delete those 
