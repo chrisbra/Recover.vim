@@ -1,11 +1,11 @@
 " Vim plugin for diffing when swap file was found
 " ---------------------------------------------------------------
 " Author: Christian Brabandt <cb@256bit.org>
-" Version: 0.9
-" Last Change: Wed, 02 Jun 2010 19:37:39 +0200
+" Version: 0.11
+" Last Change: Thu, 21 Oct 2010 22:57:10 +0200
 " Script:  http://www.vim.org/scripts/script.php?script_id=3068
 " License: VIM License
-" GetLatestVimScripts: 3068 7 :AutoInstall: recover.vim
+" GetLatestVimScripts: 3068 9 :AutoInstall: recover.vim
 "
 fu! recover#Recover(on) "{{{1
     if a:on
@@ -40,13 +40,9 @@ endfu
 
 fu! recover#ConfirmSwapDiff() "{{{1
 	call inputsave()
-	if has("gui_running")
-	   let p = inputdialog("Swap File found: Diff buffer? ", "Yes", "No")
-	else
-	   let p = input("Swap File found: Diff buffer? ", "Yes", "custom,recover#SwapFoundComplete")
-	endif
+	let p = confirm("Swap File found: Diff buffer? ", "&Yes\n&No")
 	call inputrestore()
-	if p =~? '^y\%[es]$'
+	if p == 1
 	    let v:swapchoice='r'
 	    let b:swapname=v:swapname
 	    call recover#AutoCmdBRP(1)

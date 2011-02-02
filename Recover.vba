@@ -4,12 +4,12 @@ finish
 plugin/recover.vim	[[[1
 34
 " Vim plugin for diffing when swap file was found
-" Last Change: Wed, 02 Jun 2010 19:37:39 +0200
-" Version: 0.9
+" Last Change: Thu, 21 Oct 2010 22:57:10 +0200
+" Version: 0.11
 " Author: Christian Brabandt <cb@256bit.org>
 " Script:  http://www.vim.org/scripts/script.php?script_id=3068 
 " License: VIM License
-" GetLatestVimScripts: 3068 7 :AutoInstall: recover.vim
+" GetLatestVimScripts: 3068 9 :AutoInstall: recover.vim
 " Documentation: see :h recoverPlugin.txt
 
 " ---------------------------------------------------------------------
@@ -38,15 +38,15 @@ unlet s:keepcpo
 " Modeline {{{1
 " vim: fdm=marker sw=2 sts=2 ts=8 fdl=0
 autoload/recover.vim	[[[1
-187
+183
 " Vim plugin for diffing when swap file was found
 " ---------------------------------------------------------------
 " Author: Christian Brabandt <cb@256bit.org>
-" Version: 0.9
-" Last Change: Wed, 02 Jun 2010 19:37:39 +0200
+" Version: 0.11
+" Last Change: Thu, 21 Oct 2010 22:57:10 +0200
 " Script:  http://www.vim.org/scripts/script.php?script_id=3068
 " License: VIM License
-" GetLatestVimScripts: 3068 7 :AutoInstall: recover.vim
+" GetLatestVimScripts: 3068 9 :AutoInstall: recover.vim
 "
 fu! recover#Recover(on) "{{{1
     if a:on
@@ -81,13 +81,9 @@ endfu
 
 fu! recover#ConfirmSwapDiff() "{{{1
 	call inputsave()
-	if has("gui_running")
-	   let p = inputdialog("Swap File found: Diff buffer? ", "Yes", "No")
-	else
-	   let p = input("Swap File found: Diff buffer? ", "Yes", "custom,recover#SwapFoundComplete")
-	endif
+	let p = confirm("Swap File found: Diff buffer? ", "&Yes\n&No")
 	call inputrestore()
-	if p =~? '^y\%[es]$'
+	if p == 1
 	    let v:swapchoice='r'
 	    let b:swapname=v:swapname
 	    call recover#AutoCmdBRP(1)
@@ -227,11 +223,11 @@ endfun
 
 " vim:fdl=0
 doc/recoverPlugin.txt	[[[1
-141
+143
 *recover.vim*   Show differences for recovered files
 
 Author:  Christian Brabandt <cb@256bit.org>
-Version: 0.9 Wed, 02 Jun 2010 19:37:39 +0200
+Version: 0.11 Thu, 21 Oct 2010 22:57:10 +0200
 
 Copyright: (c) 2009, 2010 by Christian Brabandt         
            The VIM LICENSE applies to recoverPlugin.vim and recoverPlugin.txt
@@ -328,7 +324,9 @@ third line of this document.
 
 ==============================================================================
 4. recover History                                          *recover-history*
-        0.10: (unreleased)      : minor documentation update
+        0.12: (unreleased)      : minor documentation update
+        0.11: Oct 19, 2010      : use confirm() instead of inputdialog()
+                                  (suggested by D.Fishburn, thanks!)
         0.9: Jun 02, 2010       : use feedkeys(...,'t') instead of feedkeys()
                                   (this works more reliable, although it
                                   pollutes the history), so delete those 
