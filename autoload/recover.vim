@@ -39,19 +39,37 @@ fu! recover#SwapFoundComplete(A,L,P) "{{{1
 endfu
 
 fu! recover#ConfirmSwapDiff() "{{{1
-	call inputsave()
-	let p = confirm("Swap File found: Diff buffer? ", "&Yes\n&No")
-	call inputrestore()
-	if p == 1
-	    let v:swapchoice='r'
-	    let b:swapname=v:swapname
-	    call recover#AutoCmdBRP(1)
-	endif
+    try
+	<sid>CheckRecover()
+    catch /^Recover:Done/
+	let v:swapchoice='e'
+	return
+    endtry
+    call inputsave()
+    let p = confirm("Swap File found: Diff buffer? ", "&Yes\n&No")
+    call inputrestore()
+    if p == 1
+	let v:swapchoice='r'
+	let b:swapname=v:swapname
+	call recover#AutoCmdBRP(1)
+    endif
 endfun
+
+fu! s:CheckRecover() "{{{1
+    let eol = (&ff =~ 'dos' ? "\r\n" : 
+	    \ (&ff =~ 'unix' ? "\n" : "\r"))
+    echo system('diff - ' . shellescape(expand('%:p'),1), join(getline(1, '$'), eol) . eol)
+    if !v:shell_error
+	call <sid>EchoMsg("No differences, deleting old swap file")
+	call delete(v:swapname)
+	throw "Recover:Done" 
+    endif
+endfun
+
 
 fu! recover#AutoCmdBRP(on) "{{{1
     if a:on
-	    augroup SwapBRP
+	augroup SwapBRP
 	    au!
 	    " Escape spaces and backslashes
 	    " On windows, we can simply replace the backslashes by forward
@@ -59,19 +77,18 @@ fu! recover#AutoCmdBRP(on) "{{{1
 	    " backslashes might exists in the path, so we handle this
 	    " situation there differently.
 	    if has("win16") || has("win32") || has("win64") || has("win32unix")
-		exe ":au BufReadPost " escape(substitute(fnamemodify(expand('<afile>'), ':p'), '\\', '/', 'g'), ' \\')" :call recover#DiffRecoveredFile()"
+		exe ":au BufReadPost " escape(substitute(fnamemodify(expand('<afile>'), ':p'), '\\', '/', 'g'), ' \\')" :call recover#CheckRecover()"
 	    else
 		exe ":au BufReadPost " escape(fnamemodify(expand('<afile>'), ':p'), ' \\')" :call recover#DiffRecoveredFile()"
 	    endif
-	    augroup END
+	augroup END
     else
-	    augroup SwapBRP
+	augroup SwapBRP
 	    au!
 	    augroup END
-	    augroup! SwapBRP
+	augroup! SwapBRP
     endif
 endfu
-
 
 fu! recover#DiffRecoveredFile() "{{{1
 	" For some reason, this only works with feedkeys.
@@ -86,7 +103,7 @@ fu! recover#DiffRecoveredFile() "{{{1
 	call feedkeys(":0r #\n", 't')
 	call feedkeys(":$delete _\n", 't')
 	if l:filetype != ""
-		call feedkeys(":setl filetype=".l:filetype."\n", 't')
+	    call feedkeys(":setl filetype=".l:filetype."\n", 't')
 	endif
 	call feedkeys(":f! " . escape(expand("<afile>")," ") . "\\ (on-disk\\ version)\n", 't')
 	call feedkeys(":let swapbufnr = bufnr('')\n", 't')
@@ -105,7 +122,7 @@ fu! recover#DiffRecoveredFile() "{{{1
 	endif
 	"call feedkeys(":redraw!\n", 't')
 	call feedkeys(":for i in range(".histnr.", histnr('cmd'), 1)|:call histdel('cmd',i)|:endfor\n",'t')
-	call feedkeys(":echo 'Found Swapfile '.b:swapname . ', showing diff!'\n", 't')
+	call feedkeys(":echo 'Found Swapfile '.b:swapname . ', showing diff!'\n", 'm')
 	" Delete Autocommand
 	call recover#AutoCmdBRP(0)
     "endif
@@ -138,7 +155,7 @@ endfun
 
 fu! s:EchoMsg(msg) "{{{1
     echohl WarningMsg
-    echomsg a:msg
+    uns echomsg a:msg
     echohl Normal
 endfu
 
@@ -148,14 +165,10 @@ fu! s:ModifySTL(enable) "{{{1
 	:let s:ostl=&stl
 	:let &stl=substitute(&stl, '%f', "\\0 %{exists('b:mod')?('['.b:mod.']') : ''}", 'g')
     else
-	let &stl=s:ostl
-    endif
-endfu
-
-fu! s:ResetSTL() "{{{1
-    " Restore old statusline setting
-    if exists("s:ostl")
-	let &stl=s:ostl
+	" Restore old statusline setting
+	if exists("s:ostl")
+	    let &stl=s:ostl
+	endif
     endif
 endfu
 
