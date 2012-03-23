@@ -17,8 +17,8 @@ fu! recover#Recover(on) "{{{1
 	augroup Swap
 	    au!
 	    au SwapExists * call recover#ConfirmSwapDiff()
-	    au BufWinEnter * call <sid>CheckRecover()
-	    au BufWinEnter,InsertEnter,InsertLeave,FocusGained * call <sid>CheckSwapFileExists()
+	    au BufWinEnter,InsertEnter,InsertLeave,FocusGained * 
+			\ call <sid>CheckSwapFileExists()
 	augroup END
     else
 	augroup Swap
@@ -43,6 +43,29 @@ fu! s:CheckSwapFileExists() "{{{1
 endfu
 
 
+fu! s:CheckRecover() "{{{1
+    let winnr = winnr()
+    if exists("b:swapname")
+	exe "recover" fnameescape(expand('%:p'))
+	let  t = tempname()
+	exe "sil w!" t
+	call system('diff '. shellescape(expand('%:p'),1).
+		    \ ' '. shellescape(t,1))
+	if !v:shell_error
+	    call <sid>EchoMsg("No differences, deleting old swap file")
+	    call delete(b:swapname)
+	else
+	    call recover#DiffRecoveredFile()
+	    let b:did_process_recovery=1
+	    " Not sure, why this needs feedkeys
+	    " Sometimes, I hate when this happens
+	    call feedkeys(":wincmd p\n\n", 't')
+	endif
+	unlet b:swapname
+    endif
+endfun
+
+
 fu! recover#SwapFoundComplete(A,L,P) "{{{1
     return "Yes\nNo"
 endfu
@@ -56,7 +79,7 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	let v:swapchoice='r'
 	" postpone recovering until later (this is done by s:CheckRecover()
 	" in an BufReadPost autocommand
-	"call recover#AutoCmdBRP(1)
+	call recover#AutoCmdBRP(1)
     else
 	" Don't show the Recovery dialog
 	let v:swapchoice='o'
@@ -64,31 +87,6 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	sleep 2
     endif
 endfun
-
-fu! s:CheckRecover() "{{{1
-    if !exists("s:start")
-	let s:start=1
-	return
-    endif
-    let winnr = winnr()
-    if exists("b:swapname") && !exists("b:did_process_recovery")
-	let eol = (&ff =~ 'dos' ? "\r\n" : 
-		\ (&ff =~ 'unix' ? "\n" : "\r"))
-	call system('diff - ' . shellescape(expand('%:p'),1), join(getline(1, '$'), eol) . eol)
-	if !v:shell_error
-	    call <sid>EchoMsg("No differences, deleting old swap file")
-	    call delete(b:swapname)
-	    return
-	else
-	    call recover#DiffRecoveredFile()
-	    let b:did_process_recovery=1
-	    " Not sure, why this needs feedkeys
-	    " Sometimes, I hate when this happens
-	    call feedkeys(":wincmd p\n\n")
-	endif
-    endif
-endfun
-
 
 fu! recover#DiffRecoveredFile() "{{{1
 	diffthis
@@ -101,7 +99,8 @@ fu! recover#DiffRecoveredFile() "{{{1
 	if l:filetype != ""
 	    exe "setl filetype=".l:filetype
 	endif
-	exe "f! " . escape(expand("<afile>")," ") . escape(' (on-disk version)', ' ')
+	exe "f! " . escape(expand("<afile>")," ") .
+		\ escape(' (on-disk version)', ' ')
 	let swapbufnr = bufnr('')
 	diffthis
 	setl noswapfile buftype=nowrite bufhidden=delete nobuflisted
@@ -182,8 +181,35 @@ fu! recover#RecoverFinish() abort "{{{1
     call s:ModifySTL(0)
 endfun
 
+fu! recover#AutoCmdBRP(on) "{{{1
+    if a:on
+	augroup SwapBRP
+	    au!
+	    " Escape spaces and backslashes
+	    " On windows, we can simply replace the backslashes by forward
+	    " slashes, since backslashes aren't allowed there anyway. On Unix,
+	    " backslashes might exists in the path, so we handle this
+	    " situation there differently.
+	    if has("win16") || has("win32") || has("win64") || has("win32unix")
+		exe ":au BufReadPost "
+		    \ escape(substitute(fnamemodify(expand('<afile>'),
+		    \ ':p'), '\\', '/', 'g'), ' \\')"
+		    \ :call s:CheckRecover()"
+	    else
+		exe ":au BufReadPost " escape(fnamemodify(expand('<afile>'),
+		    \ ':p'), ' \\')" :call s:CheckRecover()"
+	    endif
+	augroup END
+    else
+	augroup SwapBRP
+	    au!
+	augroup END
+	augroup! SwapBRP
+    endif
+endfu
 " Old functions, not used anymore "{{{1
 finish
+
 fu! recover#DiffRecoveredFileOld() "{{{2
 	" For some reason, this only works with feedkeys.
 	" I am not sure  why.
@@ -222,28 +248,6 @@ fu! recover#DiffRecoveredFileOld() "{{{2
     "endif
 endfu
 
-fu! recover#AutoCmdBRP(on) "{{{1
-    if a:on
-	augroup SwapBRP
-	    au!
-	    " Escape spaces and backslashes
-	    " On windows, we can simply replace the backslashes by forward
-	    " slashes, since backslashes aren't allowed there anyway. On Unix,
-	    " backslashes might exists in the path, so we handle this
-	    " situation there differently.
-	    "if has("win16") || has("win32") || has("win64") || has("win32unix")
-	"	exe ":au BufReadPost " escape(substitute(fnamemodify(expand('<afile>'), ':p'), '\\', '/', 'g'), ' \\')" :call recover#CheckRecover()"
-	"    else
-	"	exe ":au BufReadPost " escape(fnamemodify(expand('<afile>'), ':p'), ' \\')" :call recover#DiffRecoveredFile()"
-	"    endif
-	augroup END
-    else
-	augroup SwapBRP
-	    au!
-	augroup END
-	augroup! SwapBRP
-    endif
-endfu
 
 " Modeline "{{{1
 " vim:fdl=0
