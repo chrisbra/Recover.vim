@@ -35,7 +35,7 @@ fu! s:CheckSwapFileExists() "{{{1
 	return
     endif
     redir => a | sil swapname |redir end
-    if filereadable(split(a)[0])
+    if !filereadable(a[1:])
 	" previous SwapExists autocommand deleted our swapfile,
 	" recreate it and avoid E325 Message
 	sil! "setl noswapfile swapfile"
