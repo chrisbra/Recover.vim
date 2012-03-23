@@ -4,24 +4,24 @@ DOC=$(wildcard doc/*.txt)
 PLUGIN=$(shell basename "$$PWD")
 VERSION=$(shell sed -n '/Version:/{s/^.*\(\S\.\S\+\)$$/\1/;p}' $(SCRIPT))
 
-.PHONY: $(PLUGIN).vba README test
+.PHONY: $(PLUGIN).vmb README test
 
 all: uninstall vimball install README
 
-vimball: $(PLUGIN).vba
+vimball: $(PLUGIN).vmb
 
 clean:
 	find . -type f \( -name "*.vba" -o -name "*.orig" -o -name "*.~*" \
 	-o -name ".VimballRecord" -o -name ".*.un~" -o -name "*.sw*" -o \
-	-name tags \) -delete
+	-name tags -o -name "*.vmb" \) -delete
 
 dist-clean: clean
 
 install:
-	vim -N -c':so %' -c':q!' $(PLUGIN)-$(VERSION).vba
+	vim -N -c':so %' -c':q!' $(PLUGIN)-$(VERSION).vmb
 
 uninstall:
-	vim -N -c':RmVimball' -c':q!' $(PLUGIN)-$(VERSION).vba
+	vim -N -c':RmVimball' -c':q!' $(PLUGIN)-$(VERSION).vmb
 
 undo:
 	for i in */*.orig; do mv -f "$$i" "$${i%.*}"; done
@@ -29,18 +29,11 @@ undo:
 README:
 	cp -f $(DOC) README
 
-$(PLUGIN).vba:
-	rm -f $(PLUGIN)-$(VERSION).vba
+$(PLUGIN).vmb:
+	rm -f $(PLUGIN)-$(VERSION).vmb
 	vim -N -c 'ru! vimballPlugin.vim' -c ':call append("0", [ "$(SCRIPT)", "$(AUTOL)", "$(DOC)"])' -c '$$d' -c ":%MkVimball $(PLUGIN)-$(VERSION)  ." -c':q!'
-	ln -f $(PLUGIN)-$(VERSION).vba $(PLUGIN).vba
+	ln -f $(PLUGIN)-$(VERSION).vmb $(PLUGIN).vmb
 
-#recover.vba:
-#	rm -f recover.vba
-#	vim -N -c 'ru! vimballPlugin.vim' -c ':let g:vimball_home=getcwd()'  -c ':call append("0", ["plugin/recover.vim", "autoload/recover.vim", "doc/recoverPlugin.txt"])' -c '$$d' -c ':%MkVimball ${PLUGIN}' -c':q!'
-
-#recover:
-#	vim -N -c 'ru! vimballPlugin.vim' -c ':call append("0", ["autoload/recover.vim", "doc/recoverPlugin.txt", "plugin/recover.vim"])' -c '$$d' -c ':%MkVimball ${PLUGIN} .' -c':q!'
-     
 release: version all
 
 version:
