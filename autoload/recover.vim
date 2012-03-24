@@ -30,12 +30,17 @@ fu! recover#Recover(on) "{{{1
     endif
 endfu
 
+fu! s:Swapname() "{{{¹
+    redir => a |sil swapname|redir end
+    return a[1:]
+endfu
+
 fu! s:CheckSwapFileExists() "{{{1
     if !&swapfile 
 	return
     endif
-    redir => a | sil swapname |redir end
-    if !filereadable(a[1:])
+
+    if !filereadable(s:Swapname())
 	" previous SwapExists autocommand deleted our swapfile,
 	" recreate it and avoid E325 Message
 	sil! "setl noswapfile swapfile"
@@ -45,7 +50,7 @@ endfu
 
 fu! s:CheckRecover() "{{{1
     let winnr = winnr()
-    if exists("b:swapname")
+    if exists("b:swapname") && !exists("b:did_recovery")
 	exe "recover" fnameescape(expand('%:p'))
 	let  t = tempname()
 	exe "sil w!" t
@@ -61,7 +66,7 @@ fu! s:CheckRecover() "{{{1
 	    " Sometimes, I hate when this happens
 	    call feedkeys(":wincmd p\n\n", 't')
 	endif
-	unlet b:swapname
+	let b:did_recovery=1
     endif
 endfun
 
@@ -90,7 +95,6 @@ endfun
 
 fu! recover#DiffRecoveredFile() "{{{1
 	diffthis
-	setl modified
 	let b:mod='recovered version'
 	let l:filetype = &ft
 	noa vert new
@@ -113,6 +117,7 @@ fu! recover#DiffRecoveredFile() "{{{1
 	if has("balloon_eval")
 	    set ballooneval bexpr=recover#BalloonExprRecover()
 	endif
+	setl modified
 	echo 'Found Swapfile '.b:swapname . ', showing diff!'
 endfu
 
