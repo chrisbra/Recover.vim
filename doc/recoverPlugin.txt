@@ -1,7 +1,7 @@
 *recover.vim*   Show differences for recovered files
 
 Author:  Christian Brabandt <cb@256bit.org>
-Version: 0.11 Thu, 21 Oct 2010 22:57:10 +0200
+Version: 0.12 Sun, 25 Mar 2012 20:52:25 +0200
 
 Copyright: (c) 2009, 2010 by Christian Brabandt         
            The VIM LICENSE applies to recoverPlugin.vim and recoverPlugin.txt
@@ -98,7 +98,15 @@ third line of this document.
 
 ==============================================================================
 4. recover History                                          *recover-history*
-        0.12: (unreleased)      : minor documentation update
+        0.12: Mar 25, 2012      : minor documentation update
+                                : delete swap files, if no difference found
+                                  (issue
+                                  https://github.com/chrisbra/Recover.vim/issues/1
+                                  reported by y, thanks!)
+                                : fix some small issues, that prevented the
+                                  development versions from working
+                                  (https://github.com/chrisbra/Recover.vim/issues/2
+                                  reported by Rahul Kumar, thanks!)
         0.11: Oct 19, 2010      : use confirm() instead of inputdialog()
                                   (suggested by D.Fishburn, thanks!)
         0.9: Jun 02, 2010       : use feedkeys(...,'t') instead of feedkeys()
