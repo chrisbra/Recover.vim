@@ -1,4 +1,3 @@
-" FOOBAR TEST
 " Vim plugin for diffing when swap file was found
 " ---------------------------------------------------------------
 " Author: Christian Brabandt <cb@256bit.org>
@@ -43,10 +42,13 @@ fu! s:CheckSwapFileExists() "{{{1
     if !filereadable(s:Swapname())
 	" previous SwapExists autocommand deleted our swapfile,
 	" recreate it and avoid E325 Message
-	sil! "setl noswapfile swapfile"
+	try
+	    exe "sil! setl noswapfile swapfile"
+	catch /^Vim\%((\a\+)\)\=:E3[02]5/	" catch error E305 and E325
+	    " noop
+	endtry
     endif
 endfu
-
 
 fu! s:CheckRecover() "{{{1
     let winnr = winnr()
@@ -57,8 +59,12 @@ fu! s:CheckRecover() "{{{1
 	call system('diff '. shellescape(expand('%:p'),1).
 		    \ ' '. shellescape(t,1))
 	if !v:shell_error
-	    call <sid>EchoMsg("No differences, deleting old swap file")
-	    call delete(b:swapname)
+	    call inputsave()
+	    let p = confirm("No differences: Delete old swap file?", "&No\n&Yes")
+	    call inputrestore()
+	    if p == 1
+		call delete(b:swapname)
+	    endif
 	else
 	    call recover#DiffRecoveredFile()
 	    let b:did_process_recovery=1
@@ -77,7 +83,7 @@ endfu
 
 fu! recover#ConfirmSwapDiff() "{{{1
     call inputsave()
-    let p = confirm("Swap File found: Diff buffer? ", "&Yes\n&No")
+    let p = confirm("Swap File found: Diff buffer? ", "&Yes\n&No\n&Abort")
     call inputrestore()
     let b:swapname=v:swapname
     if p == 1
@@ -85,11 +91,14 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	" postpone recovering until later (this is done by s:CheckRecover()
 	" in an BufReadPost autocommand
 	call recover#AutoCmdBRP(1)
-    else
+    elseif p == 2
 	" Don't show the Recovery dialog
 	let v:swapchoice='o'
 	call <sid>EchoMsg("Found SwapFile, opening file readonly!")
 	sleep 2
+    else
+	" Show default menu from vim
+	return
     endif
 endfun
 

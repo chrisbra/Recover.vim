@@ -98,6 +98,13 @@ third line of this document.
 
 ==============================================================================
 4. recover History                                          *recover-history*
+        0.13: (unreleased)      : fix issue 3 (
+                                  https://github.com/chrisbra/Recover.vim/issues/3
+                                  reported by lyokha, thanks!)
+                                : Ask the user to delete the swapfile
+                                  (issue 
+                                  https://github.com/chrisbra/Recover.vim/issues/4
+                                  reported by lyokha, thanks!)
         0.12: Mar 25, 2012      : minor documentation update
                                 : delete swap files, if no difference found
                                   (issue
