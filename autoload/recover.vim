@@ -155,11 +155,13 @@ endfu
 fu! s:ModifySTL(enable) "{{{1
     if a:enable
 	" Inject some info into the statusline
-	:let s:ostl=&stl
-	:let &stl=substitute(&stl, '%f', "\\0 %{exists('b:mod')?('['.b:mod.']') : ''}", 'g')
+	let s:ostl = &stl
+	let s:nstl = substitute(&stl, '%f',
+		\ "\\0 %{exists('b:mod')?('['.b:mod.']') : ''}", 'g')
+	let &l:stl = s:nstl
     else
 	" Restore old statusline setting
-	if exists("s:ostl")
+	if exists("s:ostl") && s:nstl == &stl
 	    let &stl=s:ostl
 	endif
     endif
