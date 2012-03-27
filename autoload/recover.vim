@@ -47,7 +47,7 @@ fu! s:CheckSwapFileExists() "{{{1
 endfu
 
 fu! s:CheckRecover() "{{{1
-    if exists("b:swapname")
+    if exists("b:swapname") && !exists("b:did_recovery")
 	let t = tempname()
 	" Doing manual recovery, otherwise, BufRead autocmd seems to
 	" get into the way of the recovery
@@ -71,10 +71,8 @@ fu! s:CheckRecover() "{{{1
 	    " Not sure, why this needs feedkeys
 	    " Sometimes cursor is wrong, I hate when this happens
 	    call feedkeys(":wincmd p\n:0\n", 't')
-	    "wincmd p
-	    "0
 	endif
-	unlet b:swapname
+	let b:did_recovery = 1
     endif
 endfun
 
@@ -190,6 +188,7 @@ fu! recover#RecoverFinish() abort "{{{1
     call delete(b:swapname)
     delcommand FinishRecovery
     call s:ModifySTL(0)
+    unlet! b:swapname b:did_recovery
 endfun
 
 fu! recover#AutoCmdBRP(on) "{{{1
