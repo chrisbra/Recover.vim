@@ -2,10 +2,10 @@
 " ---------------------------------------------------------------
 " Author: Christian Brabandt <cb@256bit.org>
 " Version: 0.13
-" Last Change: Sun, 25 Mar 2012 20:52:25 +0200
+" Last Change: Thu, 29 Mar 2012 23:07:23 +0200
 " Script:  http://www.vim.org/scripts/script.php?script_id=3068
 " License: VIM License
-" GetLatestVimScripts: 3068 11 :AutoInstall: recover.vim
+" GetLatestVimScripts: 3068 13 :AutoInstall: recover.vim
 "
 fu! recover#Recover(on) "{{{1
     if a:on

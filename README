@@ -1,7 +1,7 @@
 *recover.vim*   Show differences for recovered files
 
 Author:  Christian Brabandt <cb@256bit.org>
-Version: 0.12 Sun, 25 Mar 2012 20:52:25 +0200
+Version: 0.13 Thu, 29 Mar 2012 23:07:23 +0200
 
 Copyright: (c) 2009, 2010 by Christian Brabandt         
            The VIM LICENSE applies to recoverPlugin.vim and recoverPlugin.txt
@@ -98,7 +98,7 @@ third line of this document.
 
 ==============================================================================
 4. recover History                                          *recover-history*
-        0.13: (unreleased)      : fix issue 3 (
+        0.13: Mar 29, 2012      : fix issue 3 (
                                   https://github.com/chrisbra/Recover.vim/issues/3
                                   reported by lyokha, thanks!)
                                 : Ask the user to delete the swapfile
