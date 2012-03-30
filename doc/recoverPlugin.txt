@@ -97,6 +97,7 @@ third line of this document.
 
 ==============================================================================
 4. recover History                                          *recover-history*
+        0.14: (unreleased)      : still some problems with issue #4
         0.13: Mar 29, 2012      : fix issue 3 (
                                   https://github.com/chrisbra/Recover.vim/issues/3
                                   reported by lyokha, thanks!)
