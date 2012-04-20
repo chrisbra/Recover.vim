@@ -29,9 +29,13 @@ fu! recover#Recover(on) "{{{1
     endif
 endfu
 
-fu! s:Swapname() "{{{¹
+fu! s:Swapname() "{{{1
     redir => a |sil swapname|redir end
-    return a[1:]
+    if a[1:] == 'No swap file'
+	return ''
+    else
+	return a[1:]
+    endif
 endfu
 
 fu! s:CheckSwapFileExists() "{{{1
@@ -39,10 +43,11 @@ fu! s:CheckSwapFileExists() "{{{1
 	return
     endif
 
-    if !filereadable(s:Swapname())
+    let swap = s:Swapname()
+    if !empty(swap) && !filereadable(swap)
 	" previous SwapExists autocommand deleted our swapfile,
 	" recreate it and avoid E325 Message
-	sil! setl noswapfile swapfile
+	sil setl noswapfile swapfile
     endif
 endfu
 
@@ -70,7 +75,13 @@ fu! s:CheckRecover() "{{{1
 	    call recover#DiffRecoveredFile()
 	    " Not sure, why this needs feedkeys
 	    " Sometimes cursor is wrong, I hate when this happens
-	    call feedkeys(":wincmd p\n:0\n", 't')
+	    " Cursor is wrong only when there is a single buffer open, a simple
+	    " workaround for that is to check if bufnr('') is 1: in this case
+	    " ':wincmd l\n:0\n' must be fed
+	    if bufnr('') == 1
+		call feedkeys(":wincmd l\n", 't')
+	    endif
+	    call feedkeys(":0\n", 't')
 	endif
 	let b:did_recovery = 1
     endif
@@ -104,7 +115,10 @@ fu! recover#DiffRecoveredFile() "{{{1
     let b:mod='recovered version'
     let l:filetype = &ft
     " saved version
+    let curspr = &spr
+    set nospr
     noa vert new
+    let &l:spr = curspr
     0r #
     $d _
     if l:filetype != ""
@@ -116,7 +130,7 @@ fu! recover#DiffRecoveredFile() "{{{1
     setl noswapfile buftype=nowrite bufhidden=delete nobuflisted
     let b:mod='unmodified version on-disk'
     let swapbufnr=bufnr('')
-    noa wincmd p
+    noa wincmd l
     let b:swapbufnr = swapbufnr
     command! -buffer RecoverPluginFinish :FinishRecovery
     command! -buffer FinishRecovery :call recover#RecoverFinish()
@@ -182,13 +196,16 @@ fu! recover#BalloonExprRecover() "{{{1
 endfun
 
 fu! recover#RecoverFinish() abort "{{{1
+    let swapname = b:swapname
+    let curbufnr = bufnr('')
+    delcommand FinishRecovery
     exe bufwinnr(b:swapbufnr) " wincmd w"
     diffoff
     bd!
-    call delete(b:swapname)
-    delcommand FinishRecovery
+    call delete(swapname)
     diffoff
     call s:ModifySTL(0)
+    exe bufwinnr(curbufnr) " wincmd w"
     unlet! b:swapname b:did_recovery b:swapbufnr
 endfun
 
