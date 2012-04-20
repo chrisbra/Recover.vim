@@ -97,6 +97,12 @@ third line of this document.
 
 ==============================================================================
 4. recover History                                          *recover-history*
+        0.15: (unreleased)      : fix issue 5 (
+                                  https://github.com/chrisbra/Recover.vim/issues/5
+                                  patch by lyokha, thanks!)
+                                : CheckSwapFileExists() hangs, when a swap
+                                  file was not found, make sure, s:Swapname()
+                                  returns a valid file name
         0.14: Mar 31, 2012      : still some problems with issue #4
         0.13: Mar 29, 2012      : fix issue 3 (
                                   https://github.com/chrisbra/Recover.vim/issues/3
