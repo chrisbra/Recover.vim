@@ -76,9 +76,11 @@ fu! s:CheckRecover() "{{{1
 	    " Not sure, why this needs feedkeys
 	    " Sometimes cursor is wrong, I hate when this happens
 	    " Cursor is wrong only when there is a single buffer open, a simple
-	    " workaround for that is to check if bufnr('') is 1: in this case
-	    " ':wincmd l\n:0\n' must be fed
-	    if bufnr('') == 1
+	    " workaround for that is to check if bufnr('') is 1 and total number
+	    " of windows in current tab is less than 3 (i.e. no windows were
+	    " autoopen): in this case ':wincmd l\n:0\n' must be fed to
+	    " feedkeys
+	    if bufnr('') == 1 && winnr('$') < 3
 		call feedkeys(":wincmd l\n", 't')
 	    endif
 	    call feedkeys(":0\n", 't')

@@ -103,6 +103,9 @@ third line of this document.
                                 : CheckSwapFileExists() hangs, when a swap
                                   file was not found, make sure, s:Swapname()
                                   returns a valid file name
+                                : fix issue 6 (
+                                  https://github.com/chrisbra/Recover.vim/issues/6
+                                  patch by lyokha, thanks!)
         0.14: Mar 31, 2012      : still some problems with issue #4
         0.13: Mar 29, 2012      : fix issue 3 (
                                   https://github.com/chrisbra/Recover.vim/issues/3
