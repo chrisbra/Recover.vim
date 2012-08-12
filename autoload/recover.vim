@@ -30,7 +30,7 @@ fu! recover#Recover(on) "{{{1
 endfu
 
 fu! s:Swapname() "{{{1
-    redir => a |sil swapname|redir end
+    sil! redir => a |sil swapname|redir end
     if a[1:] == 'No swap file'
 	return ''
     else
