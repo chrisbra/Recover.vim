@@ -106,6 +106,18 @@ third line of this document.
                                 : fix issue 6 (
                                   https://github.com/chrisbra/Recover.vim/issues/6
                                   patch by lyokha, thanks!)
+                                : Avoid recursive :redir call (
+                                  https://github.com/chrisbra/Recover.vim/pull/8
+                                  patch by Ingo Karkat, thanks!)
+                                : Do not set 'bexpr' for unrelated buffers (
+                                  https://github.com/chrisbra/Recover.vim/pull/9
+                                  patch by Ingo Karkat, thanks!)
+                                : Avoid aborting the diff (
+                                  https://github.com/chrisbra/Recover.vim/pull/10
+                                  patch by Ingo Karkat, thanks!)
+                                : Allow to directly delete the swapfile (
+                                  https://github.com/chrisbra/Recover.vim/issues/7
+                                  suggested by jgandt, thanks!)
         0.14: Mar 31, 2012      : still some problems with issue #4
         0.13: Mar 29, 2012      : fix issue 3 (
                                   https://github.com/chrisbra/Recover.vim/issues/3
