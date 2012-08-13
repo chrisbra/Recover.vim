@@ -118,6 +118,10 @@ fu! recover#DiffRecoveredFile() "{{{1
     diffthis
     let b:mod='recovered version'
     let l:filetype = &ft
+    if has("balloon_eval")
+	set ballooneval
+	setl bexpr=recover#BalloonExprRecover()
+    endif
     " saved version
     let curspr = &spr
     set nospr
@@ -134,13 +138,14 @@ fu! recover#DiffRecoveredFile() "{{{1
     setl noswapfile buftype=nowrite bufhidden=delete nobuflisted
     let b:mod='unmodified version on-disk'
     let swapbufnr=bufnr('')
+    if has("balloon_eval")
+	set ballooneval
+	setl bexpr=recover#BalloonExprRecover()
+    endif
     noa wincmd l
     let b:swapbufnr = swapbufnr
     command! -buffer RecoverPluginFinish :FinishRecovery
     command! -buffer FinishRecovery :call recover#RecoverFinish()
-    if has("balloon_eval")
-	set ballooneval bexpr=recover#BalloonExprRecover()
-    endif
     setl modified
 endfu
 
@@ -269,8 +274,8 @@ fu! recover#DiffRecoveredFileOld() "{{{2
 	call feedkeys(":command! -buffer FinishRecovery :call recover#RecoverFinish()\n", 't')
 	call feedkeys(":0\n", 't')
 	if has("balloon_eval")
-	"call feedkeys(':if has("balloon_eval")|:set ballooneval|set bexpr=recover#BalloonExprRecover()|endif'."\n", 't')
-	    call feedkeys(":set ballooneval|set bexpr=recover#BalloonExprRecover()\n", 't')
+	"call feedkeys(':if has("balloon_eval")|:set ballooneval|setl bexpr=recover#BalloonExprRecover()|endif'."\n", 't')
+	    call feedkeys(":set ballooneval|setl bexpr=recover#BalloonExprRecover()\n", 't')
 	endif
 	"call feedkeys(":redraw!\n", 't')
 	call feedkeys(":for i in range(".histnr.", histnr('cmd'), 1)|:call histdel('cmd',i)|:endfor\n",'t')
