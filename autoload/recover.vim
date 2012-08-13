@@ -97,7 +97,8 @@ endfun
 
 fu! recover#ConfirmSwapDiff() "{{{1
     call inputsave()
-    let p = confirm("Swap File found: Diff buffer? ", "&Yes\n&No\n&Abort")
+    let p = confirm("Swap File found: Diff buffer? ",
+	    \ "&Yes\n&No\n&Delete\n&Abort")
     call inputrestore()
     let b:swapname=v:swapname
     if p == 1
@@ -111,6 +112,10 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	let v:swapchoice='o'
 	call <sid>EchoMsg("Found SwapFile, opening file readonly!")
 	sleep 2
+    elseif p == 3
+	" Delete Swap file
+	let v:swapchoice='d'
+	call <sid>EchoMsg("Found SwapFile, deleting...")
     else
 	" Show default menu from vim
 	return
