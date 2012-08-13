@@ -58,7 +58,11 @@ fu! s:CheckRecover() "{{{1
 	let t = tempname()
 	" Doing manual recovery, otherwise, BufRead autocmd seems to
 	" get into the way of the recovery
-	exe 'recover' fnameescape(expand('%:p'))
+	try
+	    exe 'recover' fnameescape(expand('%:p'))
+	catch /^Vim\%((\a\+)\)\=:E/
+	    " Prevent any recovery error from disrupting the diff-split.
+	endtry
 	exe ':sil w' t
 	call system('diff '. shellescape(expand('%:p'),1).
 		    \ ' '. shellescape(t,1))
