@@ -66,6 +66,7 @@ fu! s:CheckRecover() "{{{1
 	exe ':sil w' t
 	call system('diff '. shellescape(expand('%:p'),1).
 		    \ ' '. shellescape(t,1))
+	call delete(t)
 	if !v:shell_error
 	    call inputsave()
 	    let p = confirm("No differences: Delete old swap file?",
@@ -96,9 +97,23 @@ fu! s:CheckRecover() "{{{1
 endfun
 
 fu! recover#ConfirmSwapDiff() "{{{1
+    let delete = 0
+    if has("unix")
+	" Check, whether the files differ issue #7
+	let tfile = tempname()
+	let cmd = printf("vim -u NONE -U NONE -N -es -r %s -c ':w %s|:q!'; diff %s %s",
+		    \ shellescape(v:swapname), tfile, shellescape(expand("%:p")), tfile)
+	call system(cmd)
+	" if return code of diff is zero, files are identical
+	call delete(tfile)
+	let delete = !v:shell_error
+    endif
+    if delete
+	echomsg "Swap and on-disk file seem to be identical"
+    endif
     call inputsave()
-    let p = confirm("Swap File found: Diff buffer? ",
-	    \ "&Yes\n&No\n&Delete\n&Abort")
+    let cmd = printf("%s", "&Yes\n&No\n&Abort". (delete ? "\n&Delete" : ""))
+    let p = confirm("Swap File found: Diff buffer? ", cmd)
     call inputrestore()
     let b:swapname=v:swapname
     if p == 1
@@ -112,8 +127,8 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	let v:swapchoice='o'
 	call <sid>EchoMsg("Found SwapFile, opening file readonly!")
 	sleep 2
-    elseif p == 3
-	" Delete Swap file
+    elseif p == 4
+	" Delete Swap file, if not different
 	let v:swapchoice='d'
 	call <sid>EchoMsg("Found SwapFile, deleting...")
     else
