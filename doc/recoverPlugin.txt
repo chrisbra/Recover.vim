@@ -40,7 +40,10 @@ To enable this plugin again, use >
 When you open a file and vim detects, that an |swap-file| already exists for a
 buffer, the plugin will ask you, if you'd like to see a diff of both versions
 using |vimdiff|. In the dialog answer 'Yes' to open the file and display a
-diff version or 'No' to open the file normally.
+diff version, 'No' to open the file normally, 'Abort' to show the normal Vim
+swapfile dialog and 'Delete' to directly delete the swapfile. Note, that
+'Delete' will only be displayed, if the swapfile and the on-disk version are
+the same.
 
 If you have said 'Yes', the plugin opens a new vertical splitt buffer. On the
 left side, you'll find the file as it is stored on disk and the right side
