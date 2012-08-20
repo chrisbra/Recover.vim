@@ -9,7 +9,7 @@ Copyright: (c) 2009, 2010 by Christian Brabandt
 
 
 ==============================================================================
-1. Contents                                                     *recoverPlugin*
+1. Contents                                                    *recoverPlugin*
 
         1.  Contents.....................................: |recoverPlugin|
         2.  recover Manual...............................: |recover-manual|
@@ -100,83 +100,93 @@ third line of this document.
 
 ==============================================================================
 4. recover History                                          *recover-history*
-        0.15: (unreleased)      : fix issue 5 (
-                                  https://github.com/chrisbra/Recover.vim/issues/5
-                                  patch by lyokha, thanks!)
-                                : CheckSwapFileExists() hangs, when a swap
-                                  file was not found, make sure, s:Swapname()
-                                  returns a valid file name
-                                : fix issue 6 (
-                                  https://github.com/chrisbra/Recover.vim/issues/6
-                                  patch by lyokha, thanks!)
-                                : Avoid recursive :redir call (
-                                  https://github.com/chrisbra/Recover.vim/pull/8
-                                  patch by Ingo Karkat, thanks!)
-                                : Do not set 'bexpr' for unrelated buffers (
-                                  https://github.com/chrisbra/Recover.vim/pull/9
-                                  patch by Ingo Karkat, thanks!)
-                                : Avoid aborting the diff (
-                                  https://github.com/chrisbra/Recover.vim/pull/10
-                                  patch by Ingo Karkat, thanks!)
-                                : Allow to directly delete the swapfile (
-                                  https://github.com/chrisbra/Recover.vim/issues/7
-                                  suggested by jgandt, thanks!)
-        0.14: Mar 31, 2012      : still some problems with issue #4
-        0.13: Mar 29, 2012      : fix issue 3 (
-                                  https://github.com/chrisbra/Recover.vim/issues/3
-                                  reported by lyokha, thanks!)
-                                : Ask the user to delete the swapfile
-                                  (issue 
-                                  https://github.com/chrisbra/Recover.vim/issues/4
-                                  reported by lyokha, thanks!)
-        0.12: Mar 25, 2012      : minor documentation update
-                                : delete swap files, if no difference found
-                                  (issue
-                                  https://github.com/chrisbra/Recover.vim/issues/1
-                                  reported by y, thanks!)
-                                : fix some small issues, that prevented the
-                                  development versions from working
-                                  (https://github.com/chrisbra/Recover.vim/issues/2
-                                  reported by Rahul Kumar, thanks!)
-        0.11: Oct 19, 2010      : use confirm() instead of inputdialog()
-                                  (suggested by D.Fishburn, thanks!)
-        0.9: Jun 02, 2010       : use feedkeys(...,'t') instead of feedkeys()
-                                  (this works more reliable, although it
-                                  pollutes the history), so delete those 
-                                  spurious history entries
-                                : |RecoverPluginHelp| shows a small help
-                                  message, about diff commands (suggested by
-                                  David Fishburn, thanks!)
-                                : |RecoverPluginFinish| is a shortcut for
-                                  |FinishRecovery|
-        0.8: Jun 01, 2010       : make :FinishRecovery more robust
-        0.7: Jun 01, 2010       : |FinishRecovery| closes the diff-window and
-                                  cleans everything up (suggestion by
-                                  David Fishburn)
-                                : :DeleteSwapFile is not needed anymore
-        0.6: May 31, 2010       : |recover-feedback|
-                                : Ask to really open a diff buffer for a 
-                                  file (suggestion: David Fishburn, thanks!)
-                                : DeleteSwapFile to delete the swap file, that
-                                  was used to create the diff buffer
-                                : change feedkeys(...,'t') to feedkeys('..')
-                                  so that not every command appears in the
-                                  history.
-        0.5: May 04, 2010       :0r command in recover plugin adds extra \n
-                                  Patch by Sergey Khorev (Thanks!)
-                                : generate help file with 'et' set, so the 
-                                  README at github looks prettier
-        0.4: Apr 26, 2010       : handle Windows and Unix path differently
-                                : Code cleanup
-                                : Enabled |:GLVS|
-        0.3: Apr 20, 2010       : first public verion
-                                : put plugin on a public repository 
-                                  (http://github.com/chrisbra/Recover.vim)
-        0.2: Apr 18, 2010       : Internal version, some cleanup,
-                                  bugfixes for windows
-        0.1: Apr 17, 2010       : Internal version, First working version, 
-                                  using simple commands
+
+0.15: Aug 20, 2012 "{{{1
+
+- fix issue 5 (https://github.com/chrisbra/Recover.vim/issues/5 patch by
+  lyokha, thanks!)
+- CheckSwapFileExists() hangs, when a swap file was not found, make sure,
+  s:Swapname() returns a valid file name
+- fix issue 6 (https://github.com/chrisbra/Recover.vim/issues/6 patch by
+  lyokha, thanks!)
+- Avoid recursive :redir call (https://github.com/chrisbra/Recover.vim/pull/8
+  patch by Ingo Karkat, thanks!)
+- Do not set 'bexpr' for unrelated buffers (
+  https://github.com/chrisbra/Recover.vim/pull/9 patch by Ingo Karkat,
+  thanks!)
+- Avoid aborting the diff (https://github.com/chrisbra/Recover.vim/pull/10
+  patch by Ingo Karkat, thanks!)
+- Allow to directly delete the swapfile (
+  https://github.com/chrisbra/Recover.vim/issues/7 suggested by jgandt,
+  thanks!)
+
+0.14: Mar 31, 2012 "{{{1
+- still some problems with issue #4
+
+0.13: Mar 29, 2012 "{{{1
+
+- fix issue 3 (https://github.com/chrisbra/Recover.vim/issues/3 reported by
+  lyokha, thanks!)
+- Ask the user to delete the swapfile (issue
+  https://github.com/chrisbra/Recover.vim/issues/4 reported by lyokha,
+  thanks!)
+
+0.12: Mar 25, 2012 "{{{1
+- minor documentation update
+- delete swap files, if no difference found (issue
+  https://github.com/chrisbra/Recover.vim/issues/1 reported by y, thanks!)
+- fix some small issues, that prevented the development versions from working
+  (https://github.com/chrisbra/Recover.vim/issues/2 reported by Rahul Kumar,
+  thanks!)
+
+0.11: Oct 19, 2010 "{{{1
+- use confirm() instead of inputdialog() (suggested by D.Fishburn, thanks!)
+
+0.9: Jun 02, 2010 "{{{1
+- use feedkeys(...,'t') instead of feedkeys() (this works more reliable,
+  although it pollutes the history), so delete those spurious history entries
+- |RecoverPluginHelp| shows a small help message, about diff commands
+  (suggested by David Fishburn, thanks!)
+- |RecoverPluginFinish| is a shortcut for |FinishRecovery|
+
+0.8: Jun 01, 2010 "{{{1
+- make :FinishRecovery more robust
+
+0.7: Jun 01, 2010 "{{{1
+- |FinishRecovery| closes the diff-window and cleans everything up (suggestion
+  by David Fishburn)
+- DeleteSwapFile is not needed anymore
+
+0.6: May 31, 2010 "{{{1
+- |recover-feedback|
+- Ask to really open a diff buffer for a file (suggestion: David Fishburn,
+  thanks!)
+- DeleteSwapFile to delete the swap file, that was used to create the diff
+  buffer
+- change feedkeys(...,'t') to feedkeys('..') so that not every command appears
+  in the history.
+
+0.5: May 04, 2010 "{{{1
+- 0r command in recover plugin adds extra \n
+  Patch by Sergey Khorev (Thanks!)
+- generate help file with 'et' set, so the README at github looks prettier
+
+0.4: Apr 26, 2010 "{{{1
+- handle Windows and Unix path differently
+- Code cleanup
+- Enabled |:GLVS|
+
+0.3: Apr 20, 2010 "{{{1
+- first public verion
+- put plugin on a public repository
+  (http://github.com/chrisbra/Recover.vim)
+
+0.2: Apr 18, 2010 "{{{1
+- Internal version, some cleanup, bugfixes for windows
+
+0.1: Apr 17, 2010 "{{{1
+- Internal version, First working version, using simple commands
 
 ==============================================================================
-Modeline:
-vim:tw=78:ts=8:ft=help:et
+Modeline: "{{{1
+vim:tw=78:ts=8:ft=help:et:fdm=marker:fdl=0:norl
