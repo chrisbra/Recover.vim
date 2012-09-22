@@ -1,11 +1,11 @@
 " Vim plugin for diffing when swap file was found
 " ---------------------------------------------------------------
 " Author: Christian Brabandt <cb@256bit.org>
-" Version: 0.14
-" Last Change: Sat, 31 Mar 2012 13:29:07 +0200
+" Version: 0.15
+" Last Change: Mon, 20 Aug 2012 20:16:32 +0200
 " Script:  http://www.vim.org/scripts/script.php?script_id=3068
 " License: VIM License
-" GetLatestVimScripts: 3068 14 :AutoInstall: recover.vim
+" GetLatestVimScripts: 3068 15 :AutoInstall: recover.vim
 "
 fu! recover#Recover(on) "{{{1
     if a:on
@@ -151,8 +151,10 @@ fu! recover#DiffRecoveredFile() "{{{1
     set nospr
     noa vert new
     let &l:spr = curspr
-    0r #
-    $d _
+    if glob(expand('#'))
+	0r #
+	$d _
+    endif
     if l:filetype != ""
 	exe "setl filetype=".l:filetype
     endif
@@ -252,12 +254,12 @@ fu! recover#AutoCmdBRP(on) "{{{1
 	    " backslashes might exists in the path, so we handle this
 	    " situation there differently.
 	    if has("win16") || has("win32") || has("win64") || has("win32unix")
-		exe ":au BufReadPost "
+		exe ":au BufNewFile,BufReadPost "
 		    \ escape(substitute(fnamemodify(expand('<afile>'),
 		    \ ':p'), '\\', '/', 'g'), ' \\')"
 		    \ :call s:CheckRecover()"
 	    else
-		exe ":au BufReadPost " escape(fnamemodify(expand('<afile>'),
+		exe ":au BufNewFile,BufReadPost " escape(fnamemodify(expand('<afile>'),
 		    \ ':p'), ' \\')" :call s:CheckRecover()"
 	    endif
 	augroup END

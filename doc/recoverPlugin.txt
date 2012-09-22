@@ -1,7 +1,7 @@
 *recover.vim*   Show differences for recovered files
 
 Author:  Christian Brabandt <cb@256bit.org>
-Version: 0.14 Sat, 31 Mar 2012 13:29:07 +0200
+Version: 0.15 Mon, 20 Aug 2012 20:16:32 +0200
 Copyright: (c) 2009, 2010 by Christian Brabandt         
            The VIM LICENSE applies to recoverPlugin.vim and recoverPlugin.txt
            (see |copyright|) except use recoverPlugin instead of "Vim".
@@ -100,6 +100,11 @@ third line of this document.
 
 ==============================================================================
 4. recover History                                          *recover-history*
+
+0.16: (unreleased) "{{{1
+- Recovery did not work, when original file did not exists (issue 11 
+  https://github.com/chrisbra/Recover.vim/issues/11
+  reported by Rking, thanks!)
 
 0.15: Aug 20, 2012 "{{{1
 
