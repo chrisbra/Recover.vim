@@ -55,10 +55,6 @@ endfu
 
 fu! s:CheckRecover() "{{{1
     if !exists("b:did_recovery")
-	if !exists("b:swapname")
-	    redir => b:swapname | sil swapname |redir end
-	    let b:swapname = b:swapname[1:]
-	endif
 	let t = tempname()
 	" Doing manual recovery, otherwise, BufRead autocmd seems to
 	" get into the way of the recovery
