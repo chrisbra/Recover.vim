@@ -54,7 +54,7 @@ fu! s:CheckSwapFileExists() "{{{1
 endfu
 
 fu! s:CheckRecover() "{{{1
-    if !exists("b:did_recovery")
+    if exists("b:swapname") && !exists("b:did_recovery")
 	let t = tempname()
 	" Doing manual recovery, otherwise, BufRead autocmd seems to
 	" get into the way of the recovery
