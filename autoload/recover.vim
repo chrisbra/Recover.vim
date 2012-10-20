@@ -241,6 +241,10 @@ fu! recover#RecoverFinish() abort "{{{1
     diffoff
     call s:ModifySTL(0)
     exe bufwinnr(curbufnr) " wincmd w"
+    if &l:swf
+	" Reset swapfile to use .swp extension
+	setl swapfile! | setl swapfile!
+    endif
     unlet! b:swapname b:did_recovery b:swapbufnr
 endfun
 
