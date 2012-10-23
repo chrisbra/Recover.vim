@@ -15,7 +15,7 @@ fu! recover#Recover(on) "{{{1
 	endif
 	augroup Swap
 	    au!
-	    au SwapExists * call recover#ConfirmSwapDiff()
+	    au SwapExists * nested :call recover#ConfirmSwapDiff()
 	    au BufWinEnter,InsertEnter,InsertLeave,FocusGained * 
 			\ call <sid>CheckSwapFileExists()
 	augroup END
@@ -104,6 +104,10 @@ fu! s:CheckRecover() "{{{1
 endfun
 
 fu! recover#ConfirmSwapDiff() "{{{1
+    if exists("b:swapchoice")
+	let v:swapchoice = b:swapchoice
+	return
+    endif
     let delete = 0
     if has("unix")
 	" Check, whether the files differ issue #7
@@ -119,12 +123,12 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	echomsg "Swap and on-disk file seem to be identical"
     endif
     call inputsave()
-    let cmd = printf("%s", "&Diff\n&Open (R/O)\n&Edit\n&Quit". (delete ? "\n&Delete" : ""))
+    let cmd = printf("%s", "&Diff\n&Open (R/O)\n&Edit\n&Quit". (delete ? "\nDele&te" : ""))
     let p = confirm("Swap File '".v:swapname."' found:", cmd, (delete ? 5 : 1))
     call inputrestore()
     let b:swapname=v:swapname
     if p == 1 || p == 3
-	let v:swapchoice='e'
+	call s:SwapChoice('3')
 	" postpone recovering until later, for now, we are opening anyways...
 	" (this is done by s:CheckRecover()
 	" in an BufReadPost autocommand
@@ -140,14 +144,20 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	let v:swapchoice='a'
     elseif p == 5
 	" Delete Swap file, if not different
-	let v:swapchoice='d'
+	call s:SwapChoice('d')
 	call <sid>EchoMsg("Found SwapFile, deleting...")
+	" might trigger SwapExists again!
 	call s:SetSwapfile()
     else
 	" Show default menu from vim
 	return
     endif
 endfun
+
+fu! s:SwapChoice(char)
+    let v:swapchoice = a:char
+    let b:swapchoice = a:char
+endfu
 
 fu! recover#DiffRecoveredFile() "{{{1
     " recovered version
