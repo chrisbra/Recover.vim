@@ -111,7 +111,7 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	let delete = !v:shell_error
     endif
     if delete
-	echomsg "Swap and on-disk file seem to be identical"
+	echomsg "Swap '". v:swapname. "' and on-disk file seem to be identical"
     endif
     call inputsave()
     let cmd = printf("%s", "&Yes\n&No\n&Abort". (delete ? "\n&Delete" : ""))
