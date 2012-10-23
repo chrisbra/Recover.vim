@@ -120,7 +120,7 @@ fu! recover#ConfirmSwapDiff() "{{{1
     endif
     call inputsave()
     let cmd = printf("%s", "&Diff\n&Open (R/O)\n&Edit\n&Quit". (delete ? "\n&Delete" : ""))
-    let p = confirm("Swap File '".v:swapname."' found:", cmd, (delete ? 4 : 1))
+    let p = confirm("Swap File '".v:swapname."' found:", cmd, (delete ? 5 : 1))
     call inputrestore()
     let b:swapname=v:swapname
     if p == 1 || p == 3
