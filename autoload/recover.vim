@@ -70,7 +70,7 @@ fu! s:CheckRecover() "{{{1
 	if !v:shell_error
 	    call inputsave()
 	    let p = confirm("No differences: Delete old swap file?",
-		    \ "&No\n&Yes")
+		    \ "&No\n&Yes", 2)
 	    call inputrestore()
 	    if p == 2
 		" Workaround for E305 error
