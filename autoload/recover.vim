@@ -69,7 +69,7 @@ fu! s:CheckRecover() "{{{1
 	call delete(t)
 	if !v:shell_error
 	    call inputsave()
-	    let p = confirm("No differences: Delete old swap file?",
+	    let p = confirm("No differences: Delete old swap file '".b:swapname."'?",
 		    \ "&No\n&Yes", 2)
 	    call inputrestore()
 	    if p == 2
