@@ -49,7 +49,7 @@ fu! s:CheckSwapFileExists() "{{{1
     if !empty(swap) && !filereadable(swap)
 	" previous SwapExists autocommand deleted our swapfile,
 	" recreate it and avoid E325 Message
-	sil setl noswapfile swapfile
+	call s:SetSwapfile()
     endif
 endfu
 
@@ -228,7 +228,7 @@ endfu
 fu! s:SetSwapfile() "{{{1
     if &l:swf
 	" Reset swapfile to use .swp extension
-	setl swapfile! | setl swapfile!
+	sil setl noswapfile swapfile
     endif
 endfu
 fu! recover#BalloonExprRecover() "{{{1
