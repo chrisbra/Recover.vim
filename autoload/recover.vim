@@ -76,6 +76,7 @@ fu! s:CheckRecover() "{{{1
 		" Workaround for E305 error
 		let v:swapchoice=''
 		call delete(b:swapname)
+		call s:SetSwapfile()
 	    endif
 	else
 	    echo 'Found Swapfile '.b:swapname . ', showing diff!'
@@ -93,6 +94,8 @@ fu! s:CheckRecover() "{{{1
 	    call feedkeys(":0\n", 't')
 	endif
 	let b:did_recovery = 1
+	call s:SetSwapfile()
+	call recover#AutoCmdBRP(0)
     endif
 endfun
 
@@ -131,6 +134,7 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	" Delete Swap file, if not different
 	let v:swapchoice='d'
 	call <sid>EchoMsg("Found SwapFile, deleting...")
+	call s:SetSwapfile()
     else
 	" Show default menu from vim
 	return
@@ -221,6 +225,12 @@ fu! s:ModifySTL(enable) "{{{1
     endif
 endfu
 
+fu! s:SetSwapfile() "{{{1
+    if &l:swf
+	" Reset swapfile to use .swp extension
+	setl swapfile! | setl swapfile!
+    endif
+endfu
 fu! recover#BalloonExprRecover() "{{{1
     " Set up a balloon expr.
     if exists("b:swapbufnr") && v:beval_bufnr!=?b:swapbufnr
@@ -241,10 +251,7 @@ fu! recover#RecoverFinish() abort "{{{1
     diffoff
     call s:ModifySTL(0)
     exe bufwinnr(curbufnr) " wincmd w"
-    if &l:swf
-	" Reset swapfile to use .swp extension
-	setl swapfile! | setl swapfile!
-    endif
+    call s:SetSwapfile()
     unlet! b:swapname b:did_recovery b:swapbufnr
 endfun
 
