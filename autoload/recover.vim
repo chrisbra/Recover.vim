@@ -76,7 +76,6 @@ fu! s:CheckRecover() "{{{1
 		" Workaround for E305 error
 		let v:swapchoice=''
 		call delete(b:swapname)
-		call s:SetSwapfile()
 	    endif
 	else
 	    echo 'Found Swapfile '.b:swapname . ', showing diff!'
@@ -95,7 +94,7 @@ fu! s:CheckRecover() "{{{1
 	endif
 	let b:did_recovery = 1
 	call s:SetSwapfile()
-	call recover#AutoCmdBRP(0)
+	"call recover#AutoCmdBRP(0)
     endif
 endfun
 
@@ -256,7 +255,7 @@ fu! recover#RecoverFinish() abort "{{{1
 endfun
 
 fu! recover#AutoCmdBRP(on) "{{{1
-    if a:on
+    if a:on && !exists("#SwapBRP")
 	augroup SwapBRP
 	    au!
 	    " Escape spaces and backslashes
@@ -274,7 +273,7 @@ fu! recover#AutoCmdBRP(on) "{{{1
 		    \ ':p'), ' \\')" :call s:CheckRecover()"
 	    endif
 	augroup END
-    else
+    elseif !a:on && exists('#SwapBRP')
 	augroup SwapBRP
 	    au!
 	augroup END
