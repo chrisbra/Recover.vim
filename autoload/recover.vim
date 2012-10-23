@@ -94,6 +94,7 @@ fu! s:CheckRecover() "{{{1
 	endif
 	let b:did_recovery = 1
 	call s:SetSwapfile()
+	" Don't delete the auto command yet.
 	"call recover#AutoCmdBRP(0)
     endif
 endfun
@@ -111,25 +112,31 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	let delete = !v:shell_error
     endif
     if delete
-	echomsg "Swap '". v:swapname. "' and on-disk file seem to be identical"
+	echomsg "Swap and on-disk file seem to be identical"
     endif
     call inputsave()
-    let cmd = printf("%s", "&Yes\n&No\n&Abort". (delete ? "\n&Delete" : ""))
-    let p = confirm("Swap File found: Diff buffer? ", cmd, (delete ? 4 : 1))
+    let cmd = printf("%s", "&Diff\n&Open (R/O)\n&Edit\n&Quit". (delete ? "\n&Delete" : ""))
+    let p = confirm("Swap File '".v:swapname."' found:\n", cmd, (delete ? 4 : 1))
     call inputrestore()
     let b:swapname=v:swapname
-    if p == 1
+    if p == 1 || p == 3
 	let v:swapchoice='e'
 	" postpone recovering until later, for now, we are opening anyways...
 	" (this is done by s:CheckRecover()
 	" in an BufReadPost autocommand
-	call recover#AutoCmdBRP(1)
+	if (p == 1)
+	    call recover#AutoCmdBRP(1)
+	endif
     elseif p == 2
 	" Don't show the Recovery dialog
 	let v:swapchoice='o'
 	call <sid>EchoMsg("Found SwapFile, opening file readonly!")
 	sleep 2
     elseif p == 4
+	let v:swapchoice='a'
+	call <sid>EchoMsg("Quitting!")
+	sleep 2
+    elseif p == 5
 	" Delete Swap file, if not different
 	let v:swapchoice='d'
 	call <sid>EchoMsg("Found SwapFile, deleting...")
