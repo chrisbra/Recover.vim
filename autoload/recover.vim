@@ -116,7 +116,7 @@ fu! recover#ConfirmSwapDiff() "{{{1
     endif
     call inputsave()
     let cmd = printf("%s", "&Yes\n&No\n&Abort". (delete ? "\n&Delete" : ""))
-    let p = confirm("Swap File found: Diff buffer? ", cmd)
+    let p = confirm("Swap File found: Diff buffer? ", cmd, (delete ? 4 : 1))
     call inputrestore()
     let b:swapname=v:swapname
     if p == 1
