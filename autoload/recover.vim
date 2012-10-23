@@ -69,6 +69,7 @@ fu! s:CheckRecover() "{{{1
 	call delete(t)
 	if !v:shell_error
 	    call inputsave()
+	    redraw! " prevent overwriting of 'Select File to use for recovery dialog'
 	    let p = confirm("No differences: Delete old swap file '".b:swapname."'?",
 		    \ "&No\n&Yes", 2)
 	    call inputrestore()
@@ -76,9 +77,11 @@ fu! s:CheckRecover() "{{{1
 		" Workaround for E305 error
 		let v:swapchoice=''
 		call delete(b:swapname)
+		" can trigger SwapExists autocommands again!
+		call s:SetSwapfile()
 	    endif
 	else
-	    echo 'Found Swapfile '.b:swapname . ', showing diff!'
+	    echo "Found Swapfile "'.b:swapname . '", showing diff!"
 	    call recover#DiffRecoveredFile()
 	    " Not sure, why this needs feedkeys
 	    " Sometimes cursor is wrong, I hate when this happens
@@ -90,10 +93,11 @@ fu! s:CheckRecover() "{{{1
 	    if bufnr('') == 1 && winnr('$') < 3
 		call feedkeys(":wincmd l\n", 't')
 	    endif
-	    call feedkeys(":0\n", 't')
+	    if !(v:version > 703 || (v:version == 703 && has("patch708")))
+		call feedkeys(":0\n", 't')
+	    endif
 	endif
 	let b:did_recovery = 1
-	call s:SetSwapfile()
 	" Don't delete the auto command yet.
 	"call recover#AutoCmdBRP(0)
     endif
@@ -116,7 +120,7 @@ fu! recover#ConfirmSwapDiff() "{{{1
     endif
     call inputsave()
     let cmd = printf("%s", "&Diff\n&Open (R/O)\n&Edit\n&Quit". (delete ? "\n&Delete" : ""))
-    let p = confirm("Swap File '".v:swapname."' found:\n", cmd, (delete ? 4 : 1))
+    let p = confirm("Swap File '".v:swapname."' found:", cmd, (delete ? 4 : 1))
     call inputrestore()
     let b:swapname=v:swapname
     if p == 1 || p == 3
@@ -134,8 +138,6 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	sleep 2
     elseif p == 4
 	let v:swapchoice='a'
-	call <sid>EchoMsg("Quitting!")
-	sleep 2
     elseif p == 5
 	" Delete Swap file, if not different
 	let v:swapchoice='d'
@@ -265,20 +267,7 @@ fu! recover#AutoCmdBRP(on) "{{{1
     if a:on && !exists("#SwapBRP")
 	augroup SwapBRP
 	    au!
-	    " Escape spaces and backslashes
-	    " On windows, we can simply replace the backslashes by forward
-	    " slashes, since backslashes aren't allowed there anyway. On Unix,
-	    " backslashes might exists in the path, so we handle this
-	    " situation there differently.
-	    if has("win16") || has("win32") || has("win64") || has("win32unix")
-		exe ":au BufNewFile,BufReadPost "
-		    \ escape(substitute(fnamemodify(expand('<afile>'),
-		    \ ':p'), '\\', '/', 'g'), ' \\')"
-		    \ :call s:CheckRecover()"
-	    else
-		exe ":au BufNewFile,BufReadPost " escape(fnamemodify(expand('<afile>'),
-		    \ ':p'), ' \\')" :call s:CheckRecover()"
-	    endif
+	    au BufNewFile,BufReadPost <buffer> :call s:CheckRecover()
 	augroup END
     elseif !a:on && exists('#SwapBRP')
 	augroup SwapBRP
