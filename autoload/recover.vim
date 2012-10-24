@@ -128,7 +128,7 @@ fu! recover#ConfirmSwapDiff() "{{{1
     call inputrestore()
     let b:swapname=v:swapname
     if p == 1 || p == 3
-	call s:SwapChoice('3')
+	call s:SwapChoice('e')
 	" postpone recovering until later, for now, we are opening anyways...
 	" (this is done by s:CheckRecover()
 	" in an BufReadPost autocommand
