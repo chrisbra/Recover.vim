@@ -173,7 +173,7 @@ fu! recover#DiffRecoveredFile() "{{{1
     set nospr
     noa vert new
     let &l:spr = curspr
-    if !empty(glob(expand('#')))
+    if !empty(glob(fnameescape(expand('#'))))
 	0r #
 	$d _
     endif
