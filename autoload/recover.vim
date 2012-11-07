@@ -123,13 +123,16 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	echomsg "Swap and on-disk file seem to be identical"
     endif
     let cmd = printf("%s", "&Diff\n&Open read-only\n&Edit\n&Quit". (delete ? "\nDele&te" : ""))
-    echo "Swap File '". v:swapname. "' found: "
-    call s:Output(cmd)
-    let cmd = substitute(cmd, '[^&]*\(&.\)[^&]*', '\1\n', 'g')
-    call inputsave()
-    "let p = confirm("Swap File '".v:swapname."' found:", cmd, (delete ? 5 : 1))
-    " skipt trailing \n
-    let p = confirm("", cmd[:-2], (delete ? 5 : 1), 'I')
+    let info = "Swap File '". v:swapname. "' found: "
+    if has("gui_running") && &go !~ 'c'
+	call inputsave()
+	let p = confirm(info, cmd, (delete ? 5 : 1), 'I')
+    else
+	echo info
+	call s:Output(cmd)
+	call inputsave()
+	let p = confirm("", cmd, (delete ? 5 : 1), 'I')
+    endif
     call inputrestore()
     let b:swapname=v:swapname
     if p == 1 || p == 3
@@ -161,7 +164,7 @@ endfun
 
 fu! s:Output(msg) "{{{1
     " Display as one string, without linebreaks
-    let msg = substitute(a:msg, '\n', ' ', 'g')
+    let msg = substitute(a:msg, '\n', '/', 'g')
     for item in split(msg, '&')
 	echohl WarningMsg
 	echon item[0]
