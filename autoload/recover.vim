@@ -81,7 +81,7 @@ fu! s:CheckRecover() "{{{1
 		call s:SetSwapfile()
 	    endif
 	else
-	    echo "Found Swapfile "'.b:swapname . '", showing diff!"
+	    echo "Found Swapfile '". b:swapname. "', showing diff!"
 	    call recover#DiffRecoveredFile()
 	    " Not sure, why this needs feedkeys
 	    " Sometimes cursor is wrong, I hate when this happens
@@ -122,9 +122,14 @@ fu! recover#ConfirmSwapDiff() "{{{1
     if delete
 	echomsg "Swap and on-disk file seem to be identical"
     endif
+    let cmd = printf("%s", "&Diff\n&Open read-only\n&Edit\n&Quit". (delete ? "\nDele&te" : ""))
+    echo "Swap File '". v:swapname. "' found: "
+    call s:Output(cmd)
+    let cmd = substitute(cmd, '[^&]*\(&.\)[^&]*', '\1\n', 'g')
     call inputsave()
-    let cmd = printf("%s", "&Diff\n&Open (R/O)\n&Edit\n&Quit". (delete ? "\nDele&te" : ""))
-    let p = confirm("Swap File '".v:swapname."' found:", cmd, (delete ? 5 : 1))
+    "let p = confirm("Swap File '".v:swapname."' found:", cmd, (delete ? 5 : 1))
+    " skipt trailing \n
+    let p = confirm("", cmd[:-2], (delete ? 5 : 1), 'I')
     call inputrestore()
     let b:swapname=v:swapname
     if p == 1 || p == 3
@@ -154,7 +159,18 @@ fu! recover#ConfirmSwapDiff() "{{{1
     endif
 endfun
 
-fu! s:SwapChoice(char)
+fu! s:Output(msg) "{{{1
+    " Display as one string, without linebreaks
+    let msg = substitute(a:msg, '\n', ' ', 'g')
+    for item in split(msg, '&')
+	echohl WarningMsg
+	echon item[0]
+	echohl Normal
+	echon item[1:]
+    endfor
+endfun
+
+fu! s:SwapChoice(char) "{{{1
     let v:swapchoice = a:char
     let b:swapchoice = a:char
 endfu
