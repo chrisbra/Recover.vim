@@ -105,6 +105,11 @@ third line of this document.
 - Recovery did not work, when original file did not exists (issue 11 
   https://github.com/chrisbra/Recover.vim/issues/11
   reported by Rking, thanks!)
+- By default, delete swapfile, if no differences found (issue 15
+  https://github.com/chrisbra/Recover.vim/issues/15
+  reported by Rking, thanks!)
+- reset 'swapfile' option, so that Vim by default creates .swp files
+  (idea and patch by Marcin Szamotulski, thanks!)
 
 0.15: Aug 20, 2012 "{{{1
 
