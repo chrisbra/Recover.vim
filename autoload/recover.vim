@@ -109,29 +109,51 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	return
     endif
     let delete = 0
+    let msg = ""
     if has("unix")
+	let bufname = shellescape(expand('%'))
+	" Capture E325 Warning message
+	let msg = system('TERM=vt100 LC_ALL=C vim -u NONE -U NONE -es -V '.bufname)
+	let msg = substitute(msg, '.*\(E325.*process ID:.\{-}\)\%x0d.*', '\1', '')
+	let msg = substitute(msg, "\e\\[\\d\\+C", "", "g")
+	" try to get processname from pid
+	let pid_pat = 'process ID:\s*\zs\d\+'
+	let pid = matchstr(msg, pid_pat)+0
+	let proc = '/proc'. pid. '/status'
+	if !empty(pid) && isdirectory('/proc')
+	    let pname = 'not existing'
+	    if filereadable('/proc/'. pid. '/status')
+		let pname = matchstr(readfile(proc)[0], '^Name:\s*\zs.*')
+	    endif
+	    let msg = substitute(msg, pid_pat, '& ['.pname.']', '')
+	endif
 	" Check, whether the files differ issue #7
 	let tfile = tempname()
 	let cmd = printf("vim -u NONE -U NONE -N -es -r %s -c ':w %s|:q!'; diff %s %s",
-		    \ shellescape(v:swapname), tfile, shellescape(expand("%:p")), tfile)
+		    \ shellescape(v:swapname), tfile, shellescape(bufname), tfile)
 	call system(cmd)
 	" if return code of diff is zero, files are identical
 	call delete(tfile)
 	let delete = !v:shell_error
+	echo msg
     endif
     if delete
 	echomsg "Swap and on-disk file seem to be identical"
     endif
     let cmd = printf("%s", "&Diff\n&Open read-only\n&Edit\n&Quit". (delete ? "\nDele&te" : ""))
-    let info = "Swap File '". v:swapname. "' found: "
+    if !empty(msg)
+	let info = 'Please choose: '
+    else
+	let info = "Swap File '". v:swapname. "' found: "
+    endif
     if has("gui_running") && &go !~ 'c'
 	call inputsave()
 	let p = confirm(info, cmd, (delete ? 5 : 1), 'I')
     else
-	echo info
-	call s:Output(cmd)
+"	echo info
+"	call s:Output(cmd)
 	call inputsave()
-	let p = confirm("", cmd, (delete ? 5 : 1), 'I')
+	let p = confirm(info, cmd, (delete ? 5 : 1), 'I')
     endif
     call inputrestore()
     let b:swapname=v:swapname
