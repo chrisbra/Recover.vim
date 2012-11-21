@@ -110,6 +110,8 @@ third line of this document.
   reported by Rking, thanks!)
 - reset 'swapfile' option, so that Vim by default creates .swp files
   (idea and patch by Marcin Szamotulski, thanks!)
+- capture and display |E325| message (and also try to figure out the name of
+  the pid (issue 12 https://github.com/chrisbra/Recover.vim/issues/12)
 
 0.15: Aug 20, 2012 "{{{1
 
