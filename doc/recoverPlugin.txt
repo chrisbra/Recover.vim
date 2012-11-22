@@ -101,6 +101,10 @@ third line of this document.
 ==============================================================================
 4. recover History                                          *recover-history*
 
+0.17 (unreleased) "{{{1
+- fix issue 17 (https://github.com/chrisbra/Recover.vim/issues/17 patch by
+  lyokha, thanks!)
+
 0.16: Nov 21, 2012 "{{{1
 - Recovery did not work, when original file did not exists (issue 11 
   https://github.com/chrisbra/Recover.vim/issues/11
