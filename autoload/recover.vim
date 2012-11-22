@@ -122,10 +122,10 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	" this is Linux specific. TODO Is there a portable way to retrive this info for at least unix?
 	let pid_pat = 'process ID:\s*\zs\d\+'
 	let pid = matchstr(msg, pid_pat)+0
-	let proc = '/proc'. pid. '/status'
 	if !empty(pid) && isdirectory('/proc')
 	    let pname = 'not existing'
-	    if filereadable('/proc/'. pid. '/status')
+	    let proc = '/proc/'. pid. '/status'
+	    if filereadable(proc)
 		let pname = matchstr(readfile(proc)[0], '^Name:\s*\zs.*')
 	    endif
 	    let msg = substitute(msg, pid_pat, '& ['.pname.']', '')
