@@ -110,13 +110,16 @@ fu! recover#ConfirmSwapDiff() "{{{1
     endif
     let delete = 0
     let msg = ""
-    if has("unix")
-	let bufname = shellescape(expand('%'))
+    let bufname = shellescape(expand('%'))
+    if executable('vim')
 	" Capture E325 Warning message
 	let msg = system('TERM=vt100 LC_ALL=C vim -u NONE -U NONE -es -V '.bufname)
 	let msg = substitute(msg, '.*\(E325.*process ID:.\{-}\)\%x0d.*', '\1', '')
 	let msg = substitute(msg, "\e\\[\\d\\+C", "", "g")
+    endif
+    if has("unix") && !empty(msg)
 	" try to get processname from pid
+	" this is Linux specific. TODO Is there a portable way to retrive this info for at least unix?
 	let pid_pat = 'process ID:\s*\zs\d\+'
 	let pid = matchstr(msg, pid_pat)+0
 	let proc = '/proc'. pid. '/status'
@@ -127,9 +130,11 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	    endif
 	    let msg = substitute(msg, pid_pat, '& ['.pname.']', '')
 	endif
+    endif
+    if executable('vim') && executable('diff')
 	" Check, whether the files differ issue #7
 	let tfile = tempname()
-	let cmd = printf("vim -u NONE -U NONE -N -es -r %s -c ':w %s|:q!'; diff %s %s",
+	let cmd = printf("vim -u NONE -U NONE -N -es -r %s -c ':w %s|:q!' && diff %s %s",
 		    \ shellescape(v:swapname), tfile, shellescape(bufname), tfile)
 	call system(cmd)
 	" if return code of diff is zero, files are identical
