@@ -38,14 +38,28 @@ To enable this plugin again, use >
     :RecoverPluginEnable
 <
 When you open a file and vim detects, that an |swap-file| already exists for a
-buffer, the plugin will ask you, if you'd like to see a diff of both versions
-using |vimdiff|. In the dialog answer 'Yes' to open the file and display a
-diff version, 'No' to open the file normally, 'Abort' to show the normal Vim
-swapfile dialog and 'Delete' to directly delete the swapfile. Note, that
-'Delete' will only be displayed, if the swapfile and the on-disk version are
-the same.
+buffer, the plugin presents the default Swap-Exists dialog from Vim adding one
+additional option for Diffing (but leaves out the lengthy explanation about
+handling Swapfiles that Vim by default shows): >
+                                                                                                                                                                     
+    Found a swap file by the name "test/normal/.testfile.swp"
+            owned by: chrisbra   dated: Wed Nov 28 16:26:42 2012
+            file name: ~chrisbra/code/git/vim/Recover/test/normal/testfile
+            modified: YES
+            user name: chrisbra   host name: R500
+            process ID: 4878 [not existing]
+    While opening file "test/normal/testfile"
+                dated: Tue Nov  6 20:11:55 2012
+    Please choose:
+    D[i]ff, (O)pen Read-Only, (E)dit anyway, (R)ecover, (Q)uit, (A)bort, (D)elete:
 
-If you have said 'Yes', the plugin opens a new vertical splitt buffer. On the
+
+(Note, that additionally, it shows in the process ID row the name of the
+process that has the process id or [not existing] if that process doesn't
+exist.) Simply use the key, that is highlighted to chose the option. If you
+press Ctrl-C, the default dialog of Vim will be shown.
+
+If you have said 'Diff', the plugin opens a new vertical splitt buffer. On the
 left side, you'll find the file as it is stored on disk and the right side
 will contain your recovered version of the file (using the found swap file).
 
@@ -104,6 +118,8 @@ third line of this document.
 0.17 (unreleased) "{{{1
 - fix issue 17 (https://github.com/chrisbra/Recover.vim/issues/17 patch by
   lyokha, thanks!)
+- Use default key combinations in the dialog of the normal Vim dialog (adding
+  only the Diff option)
 
 0.16: Nov 21, 2012 "{{{1
 - Recovery did not work, when original file did not exists (issue 11 
