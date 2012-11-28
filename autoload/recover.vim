@@ -113,6 +113,7 @@ fu! recover#ConfirmSwapDiff() "{{{1
     let bufname = shellescape(expand('%'))
     if executable('vim')
 	" Capture E325 Warning message
+	" Leave English output, so parsing will be easier
 	let msg = system('TERM=vt100 LC_ALL=C vim -u NONE -U NONE -es -V '.bufname)
 	let msg = substitute(msg, '.*\(E325.*process ID:.\{-}\)\%x0d.*', '\1', '')
 	let msg = substitute(msg, "\e\\[\\d\\+C", "", "g")
@@ -145,8 +146,8 @@ fu! recover#ConfirmSwapDiff() "{{{1
     if delete
 	echomsg "Swap and on-disk file seem to be identical"
     endif
-    let cmd = printf("%s", "&Diff\n&Open read-only\n&Edit\n&Quit".
-		\ ( (delete || !empty(msg)) ? "\nDele&te" : ""))
+    let cmd = printf("D&iff\n&Open Read-Only\n&Edit anyway\n&Recover\n&Quit\n&Abort%s",
+		\ ( (delete || !empty(msg)) ? "\n&Delete" : ""))
     if !empty(msg)
 	let info = 'Please choose: '
     else
@@ -154,16 +155,17 @@ fu! recover#ConfirmSwapDiff() "{{{1
     endif
     if has("gui_running") && &go !~ 'c'
 	call inputsave()
-	let p = confirm(info, cmd, (delete ? 5 : 1), 'I')
+	let p = confirm(info, cmd, (delete ? 7 : 1), 'I')
     else
 "	echo info
 "	call s:Output(cmd)
 	call inputsave()
-	let p = confirm(info, cmd, (delete ? 5 : 1), 'I')
+	let p = confirm(info, cmd, (delete ? 7 : 1), 'I')
     endif
     call inputrestore()
     let b:swapname=v:swapname
     if p == 1 || p == 3
+	" Diff or Edit Anyway
 	call s:SwapChoice('e')
 	" postpone recovering until later, for now, we are opening anyways...
 	" (this is done by s:CheckRecover()
@@ -172,13 +174,21 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	    call recover#AutoCmdBRP(1)
 	endif
     elseif p == 2
+	" Open Read-Only
 	" Don't show the Recovery dialog
 	let v:swapchoice='o'
 	call <sid>EchoMsg("Found SwapFile, opening file readonly!")
 	sleep 2
     elseif p == 4
-	let v:swapchoice='a'
+	" Recover
+	let v:swapchoice='r'
     elseif p == 5
+	" Quit
+	let v:swapchoice='q'
+    elseif p == 6
+	" Abort
+	let v:swapchoice='a'
+    elseif p == 7
 	" Delete Swap file, if not different
 	call s:SwapChoice('d')
 	call <sid>EchoMsg("Found SwapFile, deleting...")
@@ -317,7 +327,7 @@ fu! recover#RecoverFinish() abort "{{{1
     call s:ModifySTL(0)
     exe bufwinnr(curbufnr) " wincmd w"
     call s:SetSwapfile()
-    unlet! b:swapname b:did_recovery b:swapbufnr
+    unlet! b:swapname b:did_recovery b:swapbufnr b:swapchoice
 endfun
 
 fu! recover#AutoCmdBRP(on) "{{{1
