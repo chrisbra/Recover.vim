@@ -114,7 +114,8 @@ fu! recover#ConfirmSwapDiff() "{{{1
     if executable('vim')
 	" Capture E325 Warning message
 	" Leave English output, so parsing will be easier
-	let msg = system('TERM=vt100 LC_ALL=C vim -u NONE -U NONE -es -V '.bufname)
+	let cmd = printf("%s vim -u NONE -U NONE -es -V %s", (s:isWin() ? '' : 'TERM=vt100 LC_ALL=C'), bufname)
+	let msg = system(cmd)
 	let msg = substitute(msg, '.*\(E325.*process ID:.\{-}\)\%x0d.*', '\1', '')
 	let msg = substitute(msg, "\e\\[\\d\\+C", "", "g")
     endif
@@ -305,6 +306,10 @@ fu! s:SetSwapfile() "{{{1
 	" Reset swapfile to use .swp extension
 	sil setl noswapfile swapfile
     endif
+endfu
+
+fu! s:isWin() "{{{1
+    return has("win32") || has("win16") || has("win64")
 endfu
 fu! recover#BalloonExprRecover() "{{{1
     " Set up a balloon expr.
