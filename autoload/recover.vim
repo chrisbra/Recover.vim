@@ -110,16 +110,26 @@ fu! recover#ConfirmSwapDiff() "{{{1
     endif
     let delete = 0
     let msg = ""
-    let bufname = shellescape(expand('%'))
-    if executable('vim')
+    let bufname = s:isWin() ? fnamemodify(expand('%'), ':p:8') : shellescape(expand('%'))
+    let tfile = tempname()
+    if executable('vim') && !s:isWin()
+	" Doesn't work on windows (system() won't be able to fetch the output)
 	" Capture E325 Warning message
 	" Leave English output, so parsing will be easier
-	let cmd = printf("%s vim -u NONE -U NONE -es -V %s", (s:isWin() ? '' : 'TERM=vt100 LC_ALL=C'), bufname)
+	" TODO: make it work on windows.
+	if s:isWin()
+	  let wincmd = printf('-c "redir > %s|1d|:q!" ', tfile)
+	  let wincmd = printf('-c "call feedkeys(\"o\n\e:q!\n\")"')
+	endif
+	let cmd = printf("%svim -u NONE -es -V %s %s",
+	    \ (s:isWin() ? '' : 'TERM=vt100 LC_ALL=C '),
+	    \ (s:isWin() ? wincmd : ''),
+	    \ bufname)
 	let msg = system(cmd)
 	let msg = substitute(msg, '.*\(E325.*process ID:.\{-}\)\%x0d.*', '\1', '')
 	let msg = substitute(msg, "\e\\[\\d\\+C", "", "g")
     endif
-    if has("unix") && !empty(msg)
+    if has("unix") && !empty(msg) && system("uname") =~# "linux"
 	" try to get processname from pid
 	" this is Linux specific. TODO Is there a portable way to retrive this info for at least unix?
 	let pid_pat = 'process ID:\s*\zs\d\+'
@@ -133,17 +143,23 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	    let msg = substitute(msg, pid_pat, '& ['.pname.']', '')
 	endif
     endif
-    if executable('vim') && executable('diff')
+    if executable('vim') && executable('diff') "&& s:isWin()
 	" Check, whether the files differ issue #7
-	let tfile = tempname()
-	let cmd = printf("vim -u NONE -U NONE -N -es -r %s -c ':w %s|:q!' && diff %s %s",
-		    \ shellescape(v:swapname), tfile, shellescape(bufname), tfile)
+	" doesn't work on Windows? (cmd is ok, should be executable)
+	if s:isWin()
+	    let tfile = substitute(tfile, '/', '\\', 'g')
+	endif
+	let cmd = printf("vim -u NONE -N %s -r %s -c \":w %s|:q!\" %s diff %s %s",
+		    \ (s:isWin() ? '' : '-es'), 
+		    \ (s:isWin() ? fnamemodify(v:swapname, ':p:8') : shellescape(v:swapname)),
+		    \ tfile, (s:isWin() ? '&' : '&&'),
+		    \ bufname, tfile)
 	call system(cmd)
 	" if return code of diff is zero, files are identical
-	call delete(tfile)
 	let delete = !v:shell_error
 	echo msg
     endif
+    call delete(tfile)
     if delete
 	echomsg "Swap and on-disk file seem to be identical"
     endif
