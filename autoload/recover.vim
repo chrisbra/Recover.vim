@@ -129,7 +129,7 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	let msg = substitute(msg, '.*\(E325.*process ID:.\{-}\)\%x0d.*', '\1', '')
 	let msg = substitute(msg, "\e\\[\\d\\+C", "", "g")
     endif
-    if has("unix") && !empty(msg) && system("uname") =~# "linux"
+    if has("unix") && !empty(msg) && system("uname") =~? "linux"
 	" try to get processname from pid
 	" this is Linux specific. TODO Is there a portable way to retrive this info for at least unix?
 	let pid_pat = 'process ID:\s*\zs\d\+'
