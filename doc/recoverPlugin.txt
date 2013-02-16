@@ -120,6 +120,7 @@ third line of this document.
   lyokha, thanks!)
 - Use default key combinations in the dialog of the normal Vim dialog (adding
   only the Diff option)
+- Make sure, the process ID is shown
 
 0.16: Nov 21, 2012 "{{{1
 - Recovery did not work, when original file did not exists (issue 11 

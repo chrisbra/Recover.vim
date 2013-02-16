@@ -140,7 +140,7 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	    if filereadable(proc)
 		let pname = matchstr(readfile(proc)[0], '^Name:\s*\zs.*')
 	    endif
-	    let msg = substitute(msg, pid_pat, '& ['.pname.']', '')
+	    let msg = substitute(msg, pid_pat, '& ['.pname."]\n", '')
 	endif
     endif
     if executable('vim') && executable('diff') "&& s:isWin()
