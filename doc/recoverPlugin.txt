@@ -115,7 +115,10 @@ third line of this document.
 ==============================================================================
 4. recover History                                          *recover-history*
 
-0.17 Feb 16, 2013 "{{{1
+0.18: (unreleased) "{{{1
+- fix issue 19 (https://github.com/chrisbra/Recover.vim/issues/19, by
+  replacing feedkeys("...\n") by feedkeys("...\<cr>")
+0.17: Feb 16, 2013 "{{{1
 - fix issue 17 (https://github.com/chrisbra/Recover.vim/issues/17 patch by
   lyokha, thanks!)
 - Use default key combinations in the dialog of the normal Vim dialog (adding

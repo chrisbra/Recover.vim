@@ -91,10 +91,10 @@ fu! s:CheckRecover() "{{{1
 	    " autoopen): in this case ':wincmd l\n:0\n' must be fed to
 	    " feedkeys
 	    if bufnr('') == 1 && winnr('$') < 3
-		call feedkeys(":wincmd l\n", 't')
+		call feedkeys(":wincmd l\<cr>", 't')
 	    endif
 	    if !(v:version > 703 || (v:version == 703 && has("patch708")))
-		call feedkeys(":0\n", 't')
+		call feedkeys(":0\<cr>", 't')
 	    endif
 	endif
 	let b:did_recovery = 1
