@@ -125,7 +125,8 @@ third line of this document.
 0.18: (unreleased) "{{{1
 
 - fix issue 19 (https://github.com/chrisbra/Recover.vim/issues/19, by
-  replacing feedkeys("...\n") by feedkeys("...\<cr>")
+  replacing feedkeys("...\n") by feedkeys("...\<cr>", reported by vlmarek,
+  thanks!)
 - fix issue 20 (https://github.com/chrisbra/Recover.vim/issues/20,
   (let vim automatically edit a file, that is unmodified in another vim
   instance, suggested by rking, thanks!)
