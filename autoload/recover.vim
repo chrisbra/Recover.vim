@@ -376,8 +376,8 @@ fu! recover#AutoCmdBRP(on) "{{{1
 	augroup SwapBRP
 	    au!
 	augroup END
-	augroup! SwapBRP
     endif
+    augroup! SwapBRP
 endfu
 " Old functions, not used anymore "{{{1
 finish
