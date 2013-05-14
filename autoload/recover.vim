@@ -80,6 +80,7 @@ fu! s:CheckRecover() "{{{1
 		" can trigger SwapExists autocommands again!
 		call s:SetSwapfile()
 	    endif
+	    call recover#AutoCmdBRP(0)
 	else
 	    echo "Found Swapfile '". b:swapname. "', showing diff!"
 	    call recover#DiffRecoveredFile()
