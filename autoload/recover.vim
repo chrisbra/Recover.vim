@@ -16,7 +16,7 @@ fu! recover#Recover(on) "{{{1
 	augroup Swap
 	    au!
 	    au SwapExists * nested :call recover#ConfirmSwapDiff()
-	    au BufWinEnter,InsertEnter,InsertLeave,FocusGained * 
+	    au BufWinEnter,InsertEnter,InsertLeave,FocusGained *
 			\ call <sid>CheckSwapFileExists()
 	augroup END
     else
@@ -41,7 +41,7 @@ fu! s:Swapname() "{{{1
 endfu
 
 fu! s:CheckSwapFileExists() "{{{1
-    if !&swapfile 
+    if !&swapfile
 	return
     endif
 
@@ -99,6 +99,9 @@ fu! s:CheckRecover() "{{{1
 	    endif
 	endif
 	let b:did_recovery = 1
+	if get(s:, 'fencview_autodetect', 0)
+	    setl buftype=
+	endif
 	" Don't delete the auto command yet.
 	"call recover#AutoCmdBRP(0)
     endif
@@ -160,7 +163,7 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	    let tfile = substitute(tfile, '/', '\\', 'g')
 	endif
 	let cmd = printf("vim -u NONE -N %s -r %s -c \":w %s|:q!\" %s diff %s %s",
-		    \ (s:isWin() ? '' : '-es'), 
+		    \ (s:isWin() ? '' : '-es'),
 		    \ (s:isWin() ? fnamemodify(v:swapname, ':p:8') : shellescape(v:swapname)),
 		    \ tfile, (s:isWin() ? '&' : '&&'),
 		    \ bufname, tfile)
@@ -206,6 +209,12 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	if (p == 1)
 	    call recover#AutoCmdBRP(1)
 	endif
+	" disable fencview (issue #23)
+	" This is a hack, fencview doesn't allow to selectively disable it :(
+        let s:fencview_autodetect = get(g:, 'fencview_autodetect', 0)
+        if s:fencview_autodetect
+	    setl buftype=help
+        endif
     elseif p == 2
 	" Open Read-Only
 	" Don't show the Recovery dialog
