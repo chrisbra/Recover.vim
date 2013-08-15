@@ -9,7 +9,7 @@ Therefore this plugin sets up an auto command, that will create a diff buffer be
 By default this plugin is enabled. To disable it, use `:RecoverPluginDisable`
 To enable this plugin again, use `:RecoverPluginEnable`
 
-When you open a file and vim detects, that an swap-file already exists for a buffer, the plugin presents the default Swap-Exists dialog from Vim adding one additional option for Diffing (but leaves out the lengthy explanation about handling Swapfiles that Vim by default shows): >
+When you open a file and vim detects, that an swap-file already exists for a buffer, the plugin presents the default Swap-Exists dialog from Vim adding one additional option for Diffing (but leaves out the lengthy explanation about handling Swapfiles that Vim by default shows):
 
     Found a swap file by the name "test/normal/.testfile.swp"
             owned by: chrisbra   dated: Wed Nov 28 16:26:42 2012
@@ -22,12 +22,11 @@ When you open a file and vim detects, that an swap-file already exists for a buf
     Please choose:
     D[i]ff, (O)pen Read-Only, (E)dit anyway, (R)ecover, (Q)uit, (A)bort, (D)elete:
 
-
-(Note, that additionally, it shows in the process ID row the name of the process that has the process id or [not existing] if that process doesn't exist.) Simply use the key, that is highlighted to chose the option. If you press Ctrl-C, the default dialog of Vim will be shown.
+Note, that additionally, it shows in the process ID row of the process having opened that file or [not existing] if that process doesn't exist.) Simply use the key, that is highlighted to chose the option. If you press Ctrl-C, the default dialog of Vim will be shown.
 
 If you have said 'Diff', the plugin opens a new vertical splitt buffer. On the left side, you'll find the file as it is stored on disk and the right side will contain your recovered version of the file (using the found swap file).
 
-You can now use the merge commands to copy the contents to the buffer that holds your recovered version. If you are finished, you can close the diff version and close the window, by issuing :diffoff! and :close in the window, that contains the on-disk version of the file. Be sure to save the recovered version of you file and afterwards you can safely remove the swap file.
+You can now use the usual merge commands to copy the contents to the buffer that holds your recovered version. If you are finished, you can close the diff version and close the window, by issuing `:diffoff!` and `:close` in the window, that contains the on-disk version of the file. Be sure to save the recovered version of your file and afterwards you can safely remove the swap file.
 
 In the recovered window, the command `:FinishRecovery` deletes the swapfile closes the diff window and finishes everything up. Alternatively you can also use the command `:RecoveryPluginFinish`
 
