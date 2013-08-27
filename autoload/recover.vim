@@ -99,11 +99,11 @@ fu! s:CheckRecover() "{{{1
 	    endif
 	endif
 	let b:did_recovery = 1
-	if get(s:, 'fencview_autodetect', 0)
-	    setl buftype=
-	endif
 	" Don't delete the auto command yet.
 	"call recover#AutoCmdBRP(0)
+    endif
+    if get(s:, 'fencview_autodetect', 0)
+	setl buftype=
     endif
 endfun
 
@@ -214,6 +214,7 @@ fu! recover#ConfirmSwapDiff() "{{{1
         let s:fencview_autodetect = get(g:, 'fencview_autodetect', 0)
         if s:fencview_autodetect
 	    setl buftype=help
+	    au BufReadPost <buffer> :setl buftype=
         endif
     elseif p == 2
 	" Open Read-Only
