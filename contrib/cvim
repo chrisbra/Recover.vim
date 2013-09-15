@@ -1,0 +1,151 @@
+#!/usr/bin/env python
+# -%- coding: utf-8 -%-
+# Author: Marcin Szamotulski
+# License: VIM LICENSE.
+#          NO WARRANTY, EXPRESS OR IMPLIED> USE AT-YOUR-OWN-RISK.
+
+import os
+import sys
+import subprocess
+from glob import glob
+import fnmatch
+import argparse
+import locale
+import psutil
+from operator import attrgetter
+encoding = locale.getpreferredencoding()
+
+NO_SWAP = object()
+
+def check(swap):
+    """
+    check if swap file is used by a process
+    """
+
+    for process in psutil.get_process_list():
+        try:
+            files = process.get_open_files()
+        except  psutil.AccessDenied:
+            files = []
+        files = map(attrgetter('path'), files)
+        if swap in files:
+            return process
+
+if __name__ == '__main__':
+
+    parser=argparse.ArgumentParser()
+    parser.add_argument(
+        dest='directory',
+        nargs='?',
+        default=os.curdir,
+        help='directory where to look for swap',
+    )
+    parser.add_argument(
+        '-r', '-R', '--recursive',
+        dest='recursive',
+        action='store_true',
+        help='search directory recursively'
+    )
+    parser.add_argument(
+        '-f', '--find',
+        dest='find',
+        action='store_true',
+        help='only find swap files, it impiles -r',
+    )
+    parser.add_argument(
+        '-a', '--ask',
+        dest='ask',
+        action='store_true',
+        help='Ask before deleting swap files which do not '
+             'differ from the file content.',
+    )
+    args = parser.parse_args(sys.argv[1:])
+    if args.find:
+        args.recursive=True
+
+    os.chdir(os.path.abspath(args.directory))
+    if args.recursive:
+        swaps = []
+        for dirp, dirs, fns in os.walk(os.curdir):
+            swaps += map(lambda p: os.path.join(dirp, p).decode(encoding),
+                         fnmatch.filter(fns, '.*.sw[a-z]'))
+    else:
+        pattern = '.*.sw[a-z]'
+        swaps = glob(pattern)
+    if len(swaps) == 0:
+        print(u'No swap files found.')
+        sys.exit(os.EX_OK)
+    elif len(swaps) == 1:
+        print(u'Found: {} swap file:'.format(len(swaps)))
+    else:
+        print(u'Found: {} swap files:'.format(len(swaps)))
+    for swap in swaps:
+        print('  {}'.format(swap.encode(encoding)))
+    if args.find:
+        sys.exit(os.EX_OK)
+
+    for swap in swaps:
+        dir_, swp = os.path.split(swap)
+        fname = swp[1:-4]
+        path=os.path.join(dir_, fname)
+        _swap = swap.encode(encoding)
+
+        process = check(os.path.abspath(swap))
+        if process:
+            if process.terminal:
+                terminal = " on %s" % process.terminal
+            else:
+                terminal = ""
+            print('The "{}" swap file is used by process {} ({}){}.  '
+                  'Skipping.'.format(_swap, str(process.pid),
+                                     process.name,
+                                     terminal))
+            continue
+        recovered = '{}_'.format(_swap)
+        if os.path.exists(recovered):
+            recovered = '{}__'.format(_swap)
+            if os.path.exists(recovered):
+                print('Skipping "{0}": the temporary file exists, please '
+                        'check and delete "{0}_" and "{0}__"'.format(_swap))
+
+                continue
+        cmd = u'vim -X -u NONE -r +"w {0}|q" "{1}"'.format(recovered, _swap)
+        subprocess.call(cmd, shell=True)
+        try:
+            with open(recovered) as fo:
+                swap_content = fo.read()
+        except Exception:
+            swap_content = NO_SWAP
+        finally:
+            os.remove(recovered)
+
+        if os.path.exists(path):
+            try:
+                with open(path) as fo:
+                    file_content = fo.read()
+            except Exception:
+                file_content = None
+        else:
+            file_content = None
+
+        if file_content == swap_content:
+            if args.ask:
+                inp = raw_input('The swap file "{}" and "{}" do not differ.'
+                                '  Do you want to delete it?  [Y/N]\n'.
+                                format(_swap, path.encode(encoding))
+                                )
+                inp = inp.lower()
+                if inp == 'y' or inp == 'yes':
+                    os.remove(swap)
+            else:
+                print('Deleting "{}" swap file (matching the content)'.
+                        format(swap.encode(encoding)))
+                os.remove(swap)
+        else:
+            cmd = 'vim "{}"'.format(path.encode(encoding))
+            vim = subprocess.Popen(cmd,
+                                    shell=True)
+            if vim.wait() != 0:
+                sys.exit(vim.returncode)
+
+    sys.exit(os.EX_OK)
