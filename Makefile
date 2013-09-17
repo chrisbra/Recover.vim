@@ -1,6 +1,7 @@
 SCRIPT=$(wildcard plugin/*.vim)
 AUTOL =$(wildcard autoload/*.vim)
 DOC=$(wildcard doc/*.txt)
+CVIM=$(wildcard contrib/*)
 PLUGIN=$(shell basename "$$PWD")
 VERSION=$(shell sed -n '/Version:/{s/^.*\(\S\.\S\+\)$$/\1/;p}' $(SCRIPT))
 
@@ -28,7 +29,7 @@ undo:
 
 $(PLUGIN).vmb:
 	rm -f $(PLUGIN)-$(VERSION).vmb
-	vim -N -c 'ru! vimballPlugin.vim' -c ':call append("0", [ "$(SCRIPT)", "$(AUTOL)", "$(DOC)"])' -c '$$d' -c ":%MkVimball $(PLUGIN)-$(VERSION)  ." -c':q!'
+	vim -N -c 'ru! vimballPlugin.vim' -c ':call append("0", [ "$(SCRIPT)", "$(AUTOL)", "$(DOC)", "$(CVIM)"])' -c '$$d' -c ":%MkVimball $(PLUGIN)-$(VERSION)  ." -c':q!'
 	ln -f $(PLUGIN)-$(VERSION).vmb $(PLUGIN).vmb
 
 release: version all

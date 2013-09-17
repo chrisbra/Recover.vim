@@ -14,7 +14,8 @@ Copyright: (c) 2009, 2010, 2011, 2012, 2013 by Christian Brabandt
         1.  Contents.....................................: |recoverPlugin|
         2.  recover Manual...............................: |recover-manual|
         3.  recover Feedback.............................: |recover-feedback|
-        4.  recover History..............................: |recover-history|
+        4.  cvim.........................................: |cvim|
+        5.  recover History..............................: |recover-history|
 
 ==============================================================================
                                                               *RecoverPlugin-manual*
@@ -94,7 +95,6 @@ g:RecoverPlugin_Edit_Unmodified to 1 like this in your |.vimrc| >
     :let g:RecoverPlugin_Edit_Unmodified = 1
 <
 Note: This only works on Linux.
-
                                                         *RecoverPlugin-misc*
 If your Vim was built with |+balloon_eval|, recover.vim will also set up an
 balloon expression, that shows you, which buffer contains the recovered
@@ -108,7 +108,42 @@ have a filename (|:f|) of something like 'original file (on disk-version)'. If
 you want to save that version, use |:saveas|.
 
 ==============================================================================
-3. Plugin Feedback                                        *recover-feedback*
+3. CVIM	                                        	            	*cvim*
+
+cvim is a python script (contributed by Marcin Szamotulski) that is
+distributed together with the recoverplugin. It is located in the contrib/
+folder of the plugin source (or in the contrib/ directory of your $VIMRUNTIME/
+path (e.g. usually in ~/.vim/contrib) if you have installed the vimball
+version of the plugin)
+
+Usage:
+
+cvim [-h] [-r] [-f] [-a] {directory} ...
+
+    cvim is a python script, which can be used in a terminal to clear the
+    {directory} from |swapfile|s.  Without any switches it finds all
+    |swapfile|s then checks if a found |swapfile| is used by vim (using psutil
+    python library).  If it is not, then it reads the |swapfile| and if the
+    content matches the corresponding file it delets it.  You can get psutil
+    from:
+	http://code.google.com/p/psutil/
+
+    |cvim| works with both python2.7 and python3.4.  It may work with
+    python2.6 though it has not been tested and it will not work with
+    python3.3 or earlier.
+
+    The scripts accepts the following positional arguments:
+    {directory}         directory where to look for swap (by default current
+			directory), it can be specified multiple times.
+
+    optional arguments:
+    -h, --help           show help message and exit
+    -r, -R, --recursive  search directory recursively
+    -f, --find           only find and list |swapfile|s, it impiles -r
+    -a, --ask            ask before deleting swap files which do not differ from
+			 the file content.
+==============================================================================
+4. Plugin Feedback                                        *recover-feedback*
 
 Feedback is always welcome. If you like the plugin, please rate it at the
 vim-page:
@@ -121,7 +156,7 @@ Please don't hesitate to report any bugs to the maintainer, mentioned in the
 third line of this document.
 
 ==============================================================================
-4. recover History                                          *recover-history*
+5. recover History                                          *recover-history*
 
 0.18: Aug 14, 2013 "{{{1
 
@@ -135,6 +170,7 @@ third line of this document.
   usefule README.md file, contribted by Shubham Rao, thanks!)
 - merge issue 22 (https://github.com/chrisbra/Recover.vim/pull/22, delete BufReadPost autocommand
   contributed by Marcin Szamotulski, thanks!)
+- distribute |cvim| script (contributed by Marcin Szamotulski, thanks!)
 
 0.17: Feb 16, 2013 "{{{1
 
