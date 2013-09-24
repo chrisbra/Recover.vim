@@ -128,9 +128,12 @@ cvim [-h] [-r] [-f] [-a] {directory} ...
     from:
 	http://code.google.com/p/psutil/
 
-    |cvim| works with both python2.7 and python3.4.  It may work with
-    python2.6 though it has not been tested and it will not work with
-    python3.3 or earlier.
+    If a file has multiple |swapfile|s left you can exit vim with |:cq| to
+    preserve them all on disk or you will be asked to delete them/step through
+    them.  These |swapfile|s are sorted by their modification time stamp
+    (newest first).
+
+    |cvim| works with python2.6, 2.7 and python3.3.
 
     The scripts accepts the following positional arguments:
     {directory}         directory where to look for swap (by default current
@@ -141,7 +144,9 @@ cvim [-h] [-r] [-f] [-a] {directory} ...
     -r, -R, --recursive  search directory recursively
     -f, --find           only find and list |swapfile|s, it impiles -r
     -a, --ask            ask before deleting swap files which do not differ from
-			 the file content.
+			 the file.
+
+Note: cvim might not work on Windows.
 ==============================================================================
 4. Plugin Feedback                                        *recover-feedback*
 

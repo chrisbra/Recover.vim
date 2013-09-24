@@ -7,39 +7,230 @@
 
 import os
 import sys
+import re
 import subprocess
-from glob import glob
-import fnmatch
 import argparse
 import locale
 import psutil
+import heapq
+import tempfile
+import time
+from copy import copy
+from collections import defaultdict
 from operator import attrgetter
-import six
-if not six.PY3:
+PY3 = sys.version_info[0] == 3
+if not PY3:
     input = raw_input
 encoding = locale.getpreferredencoding()
+if PY3:
+    from functools import reduce
+    unicode = str
+else:
+    bytes = str
 
-NO_SWAP = object()
+EDITOR = u'gvim' if \
+    re.search(
+        r'gvim(\.exe)?$',
+        os.environ.get('EDITOR', 'vim')) \
+    else 'vim'
+CURDIR = os.path.normpath(os.path.abspath(os.curdir))
 
-def check(swap):
+
+def format_path(path):
+    return u"%s%s" % (os.curdir, path[len(CURDIR):]) \
+        if path.startswith(CURDIR) \
+        else path
+
+
+class StdOut(object):
     """
-    check if swap file is used by a process
+    Support for Python2.6
     """
 
-    for process in psutil.get_process_list():
+    def __getattr__(self, name):
+
+        return getattr(sys.__stdout__, name)
+
+
+    def write(self, s):
+        if isinstance(s, unicode):
+            s = s.encode(self.encoding)
+        if isinstance(s, bytes):
+            s = s.decode(self.encoding)
+        sys.__stdout__.write(s)
+
+
+sys.stdout = StdOut()
+
+
+class SwapDecodeError(Exception):
+    pass
+
+
+class File(object):
+    """
+    Class holding a file corresponding to a Swap instance.
+    """
+
+    def __init__(self, swap):
+        self.path = swap.file_name
+        self.swap = swap
+
+    @property
+    def content(self):
+        if hasattr(self, '_content'):
+            return self._content
         try:
-            files = process.get_open_files()
-        except  psutil.AccessDenied:
-            files = []
-        files = map(attrgetter('path'), files)
-        if swap in files:
-            return process
+            if PY3:
+                mode = 'br'
+            else:
+                mode = 'r'
+            with open(self.path, mode) as fo:
+                cont = fo.read()
+        except Exception:
+            cont = None
+        self._content = cont
+        return cont
+
+
+class Swap(object):
+    """
+    Class describing and introducing method related to a swap file.
+    """
+
+    def __init__(self, swap):
+
+        dirp = os.path.dirname(swap)
+        base = os.path.basename(swap)
+        if PY3:
+            self._swap = swap
+            self.swap = swap
+        else:
+            self._swap = swap
+            self.swap = swap.decode(encoding)
+        file_name, self.swapext = os.path.splitext(base)
+        try:
+            self.mtime = os.path.getmtime(self.swap)
+        except os.error:
+            self.mtime = None
+        if sys.platform == 'linux2' and not PY3 or \
+                sys.platform == 'linux' and PY3:
+            file_name = file_name[1:]
+        else:
+            # TODO: shortname option on MS-DOS machines
+            # :help :swapname
+            pass
+        self.file_name = os.path.join(dirp, file_name)
+        self.file = File(self)
+
+    def __lt__(self, other):
+
+        if self.file_name != other.file_name:
+            return self.file_name < other.file_name
+        if self.mtime is not None and other.mtime is not None:
+            # the newest first
+            return self.mtime > other.mtime
+        elif self.mtime is not None:
+            return False
+        else:
+            return True
+
+    __ne__ = lambda s, o: s != o
+    __gt__ = lambda s, o: not s < o and s != o
+
+    def __eq__(self, other):
+
+        return self.swap == other.swap
+
+    def __str__(self):
+        return self._swap
+
+    def __unicode__(self):
+        return self.swap
+
+    if PY3:
+        __str__ = __unicode__
+        del __unicode__
+
+    def check(self):
+        """
+        check if swap file is used by a process
+        """
+
+        for process in psutil.process_iter():
+            try:
+                files = process.get_open_files()
+            except psutil.AccessDenied:
+                files = []
+            except psutil.error.NoSuchProcess:
+                files = []
+            files = map(attrgetter('path'), files)
+            if not PY3:
+                files = map(lambda p: p.decode(encoding), files)
+            if self.swap in files:
+                return process
+
+    def read_swap(self):
+        """
+        Read a swap file into self._content.  Use NamedTemporaryFile.
+        """
+
+        tfile = tempfile.NamedTemporaryFile()
+        name = tfile.name
+        cmd = u'{0} -X -u NONE -r -c"w! {1}|q" {2}'.format(EDITOR, name, self.swap)
+        exit = subprocess.call(cmd, shell=True)
+        if exit != os.EX_OK:
+            e = SwapDecodeError(swap.swap)
+            e.exit = exit
+            raise e
+        self._content = tfile.read()
+        tfile.close()
+
+    def remove(self):
+        """
+        Delete the swap file.
+        """
+        if os.path.exists(self.swap):
+            os.remove(self.swap)
+            self.removed = True
+
+    @property
+    def content(self):
+        """
+        Return content of the swap file.
+        """
+
+        if hasattr(self, '_content'):
+            return self._content
+        else:
+            self.read_swap()
+            return self._content
+
+    @property
+    def is_modified(self):
+        """
+        Check if swap file differs from self.file.
+        """
+
+        return self.content != self.file.content
+
+    def format(self):
+
+        sname = format_path(self.swap)
+        if self.mtime:
+            return u'{0} ({1})'.format(
+                sname,
+                time.strftime('%x %X', time.localtime(self.mtime))
+            )
+        else:
+            return sname
+
 
 if __name__ == '__main__':
 
-    parser=argparse.ArgumentParser()
+    parser = argparse.ArgumentParser()
     parser.add_argument(
-        dest='directory',
+        dest='directories',
         nargs='*',
         default=(os.curdir,),
         help='directory where to look for swap (by default current directory)',
@@ -61,128 +252,129 @@ if __name__ == '__main__':
         dest='ask',
         action='store_true',
         help='ask before deleting swap files which do not '
-             'differ from the file content.',
+             'differ from the associated file.',
     )
     args = parser.parse_args(sys.argv[1:])
+    if not hasattr(args, 'directories'):
+        setattr(args, 'directories', [os.path.abspath(os.curdir)])
 
     if args.find:
-        args.recursive=True
+        args.recursive = True
 
-    curdir = os.path.normpath(os.path.abspath(os.curdir))
-    swaps = []
+    swaps = defaultdict(list)
+    _swaps = []
+    swap_re = re.compile('\.sw[a-z]+$')
     for dir_ in args.directories:
         if args.recursive:
             os.chdir(os.path.abspath(dir_))
             for dirp, dirs, fns in os.walk(os.curdir):
-                if six.PY3:
-                    swaps += map(lambda p:
-                                 os.path.normpath(
-                                     os.path.abspath(os.path.join(dirp, p))
-                                     ),
-                                 fnmatch.filter(fns, '.*.sw[a-z]'))
-                else:
-                    swaps += map(lambda p:
-                                 os.path.normpath(
-                                     os.path.abspath(os.path.join(dirp, p))
-                                     ).decode(encoding),
-                                 fnmatch.filter(fns, '.*.sw[a-z]'))
+                for f in fns:
+                    if swap_re.search(f):
+                        swap = Swap(os.path.abspath(os.path.join(dirp, f)))
+                        heapq.heappush(swaps[swap.file_name], swap)
+
         else:
             os.chdir(os.path.abspath(dir_))
-            pattern = '.*.sw[a-z]'
-            swaps += glob(pattern)
-    os.chdir(curdir)
+            _swaps = filter(lambda f: swap_re.search(f), os.listdir(os.curdir))
+            if not PY3:
+                _swaps = map(lambda s: s.decode(encoding), _swaps)
+            for sp in _swaps:
+                swap = Swap(sp)
+                heapq.heappush(swaps[swap.file_name], swap)
 
-    if len(swaps) == 0:
+    del _swaps
+    os.chdir(CURDIR)
+
+    if swaps:
+        nr_swaps = reduce(lambda x, y: x + y, map(len, swaps.values()))
+    else:
+        nr_swaps = 0
+
+    if nr_swaps == 0:
         print(u'No swap files found.')
         sys.exit(os.EX_OK)
-    elif len(swaps) == 1:
-        print(u'Found: {} swap file:'.format(len(swaps)))
+    elif nr_swaps == 1:
+        print(u'Found: {0} swap file (mtime):'.format(unicode(nr_swaps)))
     else:
-        print(u'Found: {} swap files:'.format(len(swaps)))
-    for swap in swaps:
-        if swap.startswith(curdir):
-            swap = u"{}{}".format(os.curdir, swap[len(curdir):])
-        if six.PY3:
-            print('  {}'.format(swap))
-        else:
-            print('  {}'.format(swap.encode(encoding)))
+        print(u'Found: {0} swap files (mtime):'.format(unicode(nr_swaps)))
+    if not PY3:
+        _CURDIR = CURDIR.decode(encoding)
+    else:
+        _CURDIR = CURDIR
+    for p, sws in swaps.items():
+        sws = copy(sws)
+        while sws:
+            swap = heapq.heappop(sws)
+            print(u'  {0}'.format(swap.format()))
     if args.find:
         sys.exit(os.EX_OK)
 
-    for swap in swaps:
-        dir_, swp = os.path.split(swap)
-        fname = swp[1:-4]
-        path=os.path.join(dir_, fname)
-        if six.PY3:
-            _swap = swap
-            _path = path
-        else:
-            _swap = swap.encode(encoding)
-            _path = path.encode(encoding)
-
-        import pdb
-        pdb.set_trace()
-
-        process = check(os.path.abspath(swap))
-        if process:
-            if process.terminal:
-                terminal = " on %s" % process.terminal
-            else:
-                terminal = ""
-
-            print('The "{}" swap file is used by process {} ({}){}.  '
-                  'Skipping.'.format(_swap, str(process.pid),
-                                     process.name,
-                                     terminal))
-            continue
-        recovered = u'{}_'.format(swap)
-        if os.path.exists(recovered):
-            recovered = u'{}__'.format(swap)
-            if os.path.exists(recovered):
-                print('Skipping "{0}": the temporary file exists, please '
-                      'check and delete "{0}_" and "{0}__"'.format(_swap))
-
+    # main loop
+    for file_name in swaps.keys():
+        sws = swaps[file_name]
+        len_sws = len(sws)
+        if len_sws > 1:
+            print(u"Multiple swap files for \"{0}\" (exit {1} with :cq to keep the "
+                  u"remaining ones)".format(format_path(swap.file_name), EDITOR))
+        delete = False
+        while sws:
+            # pop the youngest swap files first
+            swap = heapq.heappop(sws)
+            process = swap.check()
+            if process:
+                if process.terminal:
+                    terminal = u" on %s" % process.terminal.decode('utf-8')
+                else:
+                    terminal = u""
+                print(u'The "{0}" swap file is used by process {1} ({2}){3}.  '
+                      u'Skipping.'.format(swap, unicode(process.pid),
+                                          process.name.decode(encoding),
+                                          terminal))
                 continue
-        cmd = u'vim -X -u NONE -r +"w {0}|q" "{1}"'.format(recovered, swap)
-        exit = subprocess.call(cmd, shell=True)
-        if exit != os.EX_OK:
-            print(u'Skipping {}: vim exited with error code {}'.format(_swap, exit))
-            continue
-        try:
-            with open(recovered) as fo:
-                swap_content = fo.read()
-        except Exception as e:
-            swap_content = NO_SWAP
-        finally:
-            os.remove(recovered)
 
-        if os.path.exists(path):
             try:
-                with open(path) as fo:
-                    file_content = fo.read()
-            except Exception:
-                file_content = None
-        else:
-            file_content = None
+                swap.read_swap()
+            except SwapDecodeError as e:
+                print(u'Skipping {0}: {1} exited with error code {2}'.format(swap, EDITOR, unicode(e.exit)))
+                continue
 
-        if file_content == swap_content:
-            if args.ask:
-                inp = input('The swap file "{}" and "{}" do not differ.'
-                            '  Do you want to delete it?  [Y/N]\n'.
-                            format(_swap, _path)
-                            )
-                inp = inp.lower()
-                if inp == 'y' or inp == 'yes':
-                    os.remove(swap)
+            if not swap.is_modified:
+                if args.ask:
+                    inp = input('The swap file "{0}" and "{1}" do not differ.'
+                                ' Do you want to delete it?  [Y/N]\n'
+                                .format(os.path.basename(swap._swap),
+                                        os.path.basename(swap.file_name))
+                                )
+                    inp = inp.lower()
+                    if inp in ('y', 'yes'):
+                        swap.remove()
+                else:
+                    print(u'Deleting "{0}" swap file (matching the content)'
+                          .format(swap))
+                    swap.remove()
             else:
-                print(u'Deleting "{}" swap file (matching the content)'.
-                      format(_swap))
-                os.remove(swap)
-        else:
-            cmd = u'vim "{}"'.format(_path)
-            vim = subprocess.Popen(cmd,
-                                   shell=True)
-            if vim.wait() != 0:
-                sys.exit(vim.returncode)
+                if len_sws > 1:
+                    # b:swapname is set for :FinishRecovery
+                    cmd = u'{0} -X +"call recover#DiffRecoveredFile()|let b:swapname=\'{1}\'" -r "{1}"'. \
+                        format(EDITOR, swap)
+                else:
+                    cmd = u'{0} -X "{1}"'.format(EDITOR, swap.file_name)
+                print(u'\n{0}'.format(cmd))
+                vim = subprocess.Popen(cmd, shell=True)
+                if vim.wait() != 0:
+                    break
+                elif len_sws > 1 and sws:
+                    inp = input('There are more swap files for "{0}", do'
+                                ' you want to delete them all? [Y/N]'.
+                                format(format_path(swap.file_name)))
+                    if inp.lower() in ('y', 'yes'):
+                        swap.remove()
+                        delete = True
+                        break
+        if delete and sws:
+            print(u'Deleting swap files:')
+            for swap in sws:
+                print(u'\t{0}'.format(format_path(swap.swap)))
+                swap.remove()
 
     sys.exit(os.EX_OK)
