@@ -118,8 +118,9 @@ fu! recover#ConfirmSwapDiff() "{{{1
     let msg = ""
     let bufname = s:isWin() ? fnamemodify(expand('%'), ':p:8') : shellescape(expand('%'))
     let tfile = tempname()
-    if executable('vim') && !s:isWin() && !s:isMac()
-	" Doesn't work on windows and Mac (system() won't be able to fetch the output)
+    if executable('vim') && !s:isWin() && !s:isMacTerm()
+	" Doesn't work on windows (system() won't be able to fetch the output)
+	" and Mac Terminal (issue #24)  
 	" Capture E325 Warning message
 	" Leave English output, so parsing will be easier
 	" TODO: make it work on windows.
@@ -353,8 +354,8 @@ endfu
 fu! s:isWin() "{{{1
     return has("win32") || has("win16") || has("win64")
 endfu
-fu! s:isMac() "{{{1
-    return has("mac") || has("macunix")
+fu! s:isMacTerm() "{{{1
+    return (has("mac") || has("macunix")) && !has("gui_mac")
 endfu
 fu! recover#BalloonExprRecover() "{{{1
     " Set up a balloon expr.
