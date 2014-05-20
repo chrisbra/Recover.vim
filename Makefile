@@ -5,7 +5,7 @@ CVIM=$(wildcard contrib/*)
 PLUGIN=$(shell basename "$$PWD")
 VERSION=$(shell sed -n '/Version:/{s/^.*\(\S\.\S\+\)$$/\1/;p}' $(SCRIPT))
 
-.PHONY: $(PLUGIN).vmb test
+.PHONY: test
 
 all: vimball
 
