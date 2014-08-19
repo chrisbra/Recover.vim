@@ -9,7 +9,6 @@
 "
 fu! recover#Recover(on) "{{{1
     if a:on
-	call s:ModifySTL(1)
 	if !exists("s:old_vsc")
 	    let s:old_vsc = v:swapchoice
 	endif
@@ -112,6 +111,7 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	let v:swapchoice = b:swapchoice
 	return
     endif
+    call s:ModifySTL(1)
     let delete = 0
     let do_modification_check = exists("g:RecoverPlugin_Edit_Unmodified") ? g:RecoverPlugin_Edit_Unmodified : 0
     let not_modified = 0
