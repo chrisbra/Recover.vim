@@ -167,6 +167,9 @@ third line of this document.
 - fix issue 29 (plugin always loaded autoload part, 
   https://github.com/chrisbra/Recover.vim/issues/29,
   reported by Justin Keyes, thanks!)
+- fix issue 30 (remove needless 2 second sleep,
+  https://github.com/chrisbra/Recover.vim/issues/30,
+  reported by Justin Keyes, thanks!)
 
 0.18: Aug 14, 2013 "{{{1
 

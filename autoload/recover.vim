@@ -201,7 +201,6 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	" Don't show the Recovery dialog
 	let v:swapchoice='o'
 	call <sid>EchoMsg("Found SwapFile, opening file readonly!")
-	sleep 2
     elseif p == 4
 	" Recover
 	let v:swapchoice='r'
