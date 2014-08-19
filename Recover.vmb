@@ -2,7 +2,7 @@
 UseVimball
 finish
 plugin/recover.vim	[[[1
-34
+56
 " Vim plugin for diffing when swap file was found
 " Last Change: Wed, 14 Aug 2013 22:39:13 +0200
 " Version: 0.18
@@ -21,36 +21,8 @@ let g:loaded_recover = 1"}}}
 let s:keepcpo          = &cpo
 set cpo&vim
 
-" ---------------------------------------------------------------------
-" Public Interface {{{1
-" Define User-Commands and Autocommand "{{{
-call recover#Recover(1)
-
-com! RecoverPluginEnable :call recover#Recover(1)
-com! RecoverPluginDisable :call recover#Recover(0)
-com! RecoverPluginHelp   :call recover#Help()
-
-" =====================================================================
-" Restoration And Modelines: {{{1
-let &cpo= s:keepcpo
-unlet s:keepcpo
-
-" Modeline {{{1
-" vim: fdm=marker sw=2 sts=2 ts=8 fdl=0
-autoload/recover.vim	[[[1
-435
-" Vim plugin for diffing when swap file was found
-" ---------------------------------------------------------------
-" Author: Christian Brabandt <cb@256bit.org>
-" Version: 0.18
-" Last Change: Wed, 14 Aug 2013 22:39:13 +0200
-" Script:  http://www.vim.org/scripts/script.php?script_id=3068
-" License: VIM License
-" GetLatestVimScripts: 3068 18 :AutoInstall: recover.vim
-"
-fu! recover#Recover(on) "{{{1
+fu! s:Recover(on) "{{{1
     if a:on
-	call s:ModifySTL(1)
 	if !exists("s:old_vsc")
 	    let s:old_vsc = v:swapchoice
 	endif
@@ -58,7 +30,7 @@ fu! recover#Recover(on) "{{{1
 	    au!
 	    au SwapExists * nested :call recover#ConfirmSwapDiff()
 	    au BufWinEnter,InsertEnter,InsertLeave,FocusGained *
-			\ call <sid>CheckSwapFileExists()
+			\ call recover#CheckSwapFileExists()
 	augroup END
     else
 	augroup Swap
@@ -70,6 +42,34 @@ fu! recover#Recover(on) "{{{1
     endif
 endfu
 
+
+" ---------------------------------------------------------------------
+" Public Interface {{{1
+" Define User-Commands and Autocommand "{{{
+call s:Recover(1)
+
+com! RecoverPluginEnable  :call s:Recover(1)
+com! RecoverPluginDisable :call s:Recover(0)
+com! RecoverPluginHelp    :call recover#Help()
+
+" =====================================================================
+" Restoration And Modelines: {{{1
+let &cpo= s:keepcpo
+unlet s:keepcpo
+
+" Modeline {{{1
+" vim: fdm=marker sw=2 sts=2 ts=8 fdl=0
+autoload/recover.vim	[[[1
+419
+" Vim plugin for diffing when swap file was found
+" ---------------------------------------------------------------
+" Author: Christian Brabandt <cb@256bit.org>
+" Version: 0.18
+" Last Change: Wed, 14 Aug 2013 22:39:13 +0200
+" Script:  http://www.vim.org/scripts/script.php?script_id=3068
+" License: VIM License
+" GetLatestVimScripts: 3068 18 :AutoInstall: recover.vim
+"
 fu! s:Swapname() "{{{1
     " Use sil! so a failing redir (e.g. recursive redir call)
     " won't hurt. (https://github.com/chrisbra/Recover.vim/pull/8)
@@ -81,7 +81,7 @@ fu! s:Swapname() "{{{1
     endif
 endfu
 
-fu! s:CheckSwapFileExists() "{{{1
+fu! recover#CheckSwapFileExists() "{{{1
     if !&swapfile
 	return
     endif
@@ -140,11 +140,11 @@ fu! s:CheckRecover() "{{{1
 	    endif
 	endif
 	let b:did_recovery = 1
-	if get(s:, 'fencview_autodetect', 0)
-	    setl buftype=
-	endif
 	" Don't delete the auto command yet.
 	"call recover#AutoCmdBRP(0)
+    endif
+    if get(s:, 'fencview_autodetect', 0)
+	setl buftype=
     endif
 endfun
 
@@ -153,14 +153,16 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	let v:swapchoice = b:swapchoice
 	return
     endif
+    call s:ModifySTL(1)
     let delete = 0
     let do_modification_check = exists("g:RecoverPlugin_Edit_Unmodified") ? g:RecoverPlugin_Edit_Unmodified : 0
     let not_modified = 0
     let msg = ""
     let bufname = s:isWin() ? fnamemodify(expand('%'), ':p:8') : shellescape(expand('%'))
     let tfile = tempname()
-    if executable('vim') && !s:isWin()
+    if executable('vim') && !s:isWin() && !s:isMacTerm()
 	" Doesn't work on windows (system() won't be able to fetch the output)
+	" and Mac Terminal (issue #24)  
 	" Capture E325 Warning message
 	" Leave English output, so parsing will be easier
 	" TODO: make it work on windows.
@@ -255,6 +257,7 @@ fu! recover#ConfirmSwapDiff() "{{{1
         let s:fencview_autodetect = get(g:, 'fencview_autodetect', 0)
         if s:fencview_autodetect
 	    setl buftype=help
+	    au BufReadPost <buffer> :setl buftype=
         endif
     elseif p == 2
 	" Open Read-Only
@@ -393,6 +396,9 @@ endfu
 fu! s:isWin() "{{{1
     return has("win32") || has("win16") || has("win64")
 endfu
+fu! s:isMacTerm() "{{{1
+    return (has("mac") || has("macunix")) && !has("gui_mac")
+endfu
 fu! recover#BalloonExprRecover() "{{{1
     " Set up a balloon expr.
     if exists("b:swapbufnr") && v:beval_bufnr!=?b:swapbufnr
@@ -475,7 +481,7 @@ endfu
 " Modeline "{{{1
 " vim:fdl=0
 doc/recoverPlugin.txt	[[[1
-260
+306
 *recover.vim*   Show differences for recovered files
 
 Author:  Christian Brabandt <cb@256bit.org>
@@ -492,7 +498,8 @@ Copyright: (c) 2009, 2010, 2011, 2012, 2013 by Christian Brabandt
         1.  Contents.....................................: |recoverPlugin|
         2.  recover Manual...............................: |recover-manual|
         3.  recover Feedback.............................: |recover-feedback|
-        4.  recover History..............................: |recover-history|
+        4.  cvim.........................................: |cvim|
+        5.  recover History..............................: |recover-history|
 
 ==============================================================================
                                                               *RecoverPlugin-manual*
@@ -572,7 +579,6 @@ g:RecoverPlugin_Edit_Unmodified to 1 like this in your |.vimrc| >
     :let g:RecoverPlugin_Edit_Unmodified = 1
 <
 Note: This only works on Linux.
-
                                                         *RecoverPlugin-misc*
 If your Vim was built with |+balloon_eval|, recover.vim will also set up an
 balloon expression, that shows you, which buffer contains the recovered
@@ -586,7 +592,47 @@ have a filename (|:f|) of something like 'original file (on disk-version)'. If
 you want to save that version, use |:saveas|.
 
 ==============================================================================
-3. Plugin Feedback                                        *recover-feedback*
+3. CVIM	                                        	            	*cvim*
+
+cvim is a python script (contributed by Marcin Szamotulski) that is
+distributed together with the recoverplugin. It is located in the contrib/
+folder of the plugin source (or in the contrib/ directory of your $VIMRUNTIME/
+path (e.g. usually in ~/.vim/contrib) if you have installed the vimball
+version of the plugin)
+
+Usage:
+
+cvim [-h] [-r] [-f] [-a] {directory} ...
+
+    cvim is a python script, which can be used in a terminal to clear the
+    {directory} from |swapfile|s.  Without any switches it finds all
+    |swapfile|s then checks if a found |swapfile| is used by vim (using psutil
+    python library).  If it is not, then it reads the |swapfile| and if the
+    content matches the corresponding file it delets it.  You can get psutil
+    from:
+	http://code.google.com/p/psutil/
+
+    If a file has multiple |swapfile|s left you can exit vim with |:cq| to
+    preserve them all on disk or you will be asked to delete them/step through
+    them.  These |swapfile|s are sorted by their modification time stamp
+    (newest first).
+
+    |cvim| works with python2.6, 2.7 and python3.3.
+
+    The scripts accepts the following positional arguments:
+    {directory}         directory where to look for swap (by default current
+			directory), it can be specified multiple times.
+
+    optional arguments:
+    -h, --help           show help message and exit
+    -r, -R, --recursive  search directory recursively
+    -f, --find           only find and list |swapfile|s, it impiles -r
+    -a, --ask            ask before deleting swap files which do not differ from
+			 the file.
+
+Note: cvim might not work on Windows.
+==============================================================================
+4. Plugin Feedback                                        *recover-feedback*
 
 Feedback is always welcome. If you like the plugin, please rate it at the
 vim-page:
@@ -599,7 +645,12 @@ Please don't hesitate to report any bugs to the maintainer, mentioned in the
 third line of this document.
 
 ==============================================================================
-4. recover History                                          *recover-history*
+5. recover History                                          *recover-history*
+
+0.19: (unreleased) "{{{1
+- fix issue 29 (plugin always loaded autoload part, 
+  https://github.com/chrisbra/Recover.vim/issues/29,
+  reported by Justin Keyes, thanks!)
 
 0.18: Aug 14, 2013 "{{{1
 
@@ -613,6 +664,7 @@ third line of this document.
   usefule README.md file, contribted by Shubham Rao, thanks!)
 - merge issue 22 (https://github.com/chrisbra/Recover.vim/pull/22, delete BufReadPost autocommand
   contributed by Marcin Szamotulski, thanks!)
+- distribute |cvim| script (contributed by Marcin Szamotulski, thanks!)
 
 0.17: Feb 16, 2013 "{{{1
 
@@ -736,3 +788,385 @@ third line of this document.
 ==============================================================================
 Modeline: "{{{1
 vim:tw=78:ts=8:ft=help:et:fdm=marker:fdl=0:norl
+contrib/cvim	[[[1
+380
+#!/usr/bin/env python
+# -%- coding: utf-8 -%-
+# Author: Marcin Szamotulski
+# Python Versions: 2.7, 3.4
+# License: VIM LICENSE.
+#          NO WARRANTY, EXPRESS OR IMPLIED> USE AT-YOUR-OWN-RISK.
+
+import os
+import sys
+import re
+import subprocess
+import argparse
+import locale
+import psutil
+import heapq
+import tempfile
+import time
+from copy import copy
+from collections import defaultdict
+from operator import attrgetter
+PY3 = sys.version_info[0] == 3
+if not PY3:
+    input = raw_input
+encoding = locale.getpreferredencoding()
+if PY3:
+    from functools import reduce
+    unicode = str
+else:
+    bytes = str
+
+EDITOR = u'gvim' if \
+    re.search(
+        r'gvim(\.exe)?$',
+        os.environ.get('EDITOR', 'vim')) \
+    else 'vim'
+CURDIR = os.path.normpath(os.path.abspath(os.curdir))
+
+
+def format_path(path):
+    return u"%s%s" % (os.curdir, path[len(CURDIR):]) \
+        if path.startswith(CURDIR) \
+        else path
+
+
+class StdOut(object):
+    """
+    Support for Python2.6
+    """
+
+    def __getattr__(self, name):
+
+        return getattr(sys.__stdout__, name)
+
+
+    def write(self, s):
+        if isinstance(s, unicode):
+            s = s.encode(self.encoding)
+        if isinstance(s, bytes):
+            s = s.decode(self.encoding)
+        sys.__stdout__.write(s)
+
+
+sys.stdout = StdOut()
+
+
+class SwapDecodeError(Exception):
+    pass
+
+
+class File(object):
+    """
+    Class holding a file corresponding to a Swap instance.
+    """
+
+    def __init__(self, swap):
+        self.path = swap.file_name
+        self.swap = swap
+
+    @property
+    def content(self):
+        if hasattr(self, '_content'):
+            return self._content
+        try:
+            if PY3:
+                mode = 'br'
+            else:
+                mode = 'r'
+            with open(self.path, mode) as fo:
+                cont = fo.read()
+        except Exception:
+            cont = None
+        self._content = cont
+        return cont
+
+
+class Swap(object):
+    """
+    Class describing and introducing method related to a swap file.
+    """
+
+    def __init__(self, swap):
+
+        dirp = os.path.dirname(swap)
+        base = os.path.basename(swap)
+        if PY3:
+            self._swap = swap
+            self.swap = swap
+        else:
+            self._swap = swap
+            self.swap = swap.decode(encoding)
+        file_name, self.swapext = os.path.splitext(base)
+        try:
+            self.mtime = os.path.getmtime(self.swap)
+        except os.error:
+            self.mtime = None
+        if sys.platform == 'linux2' and not PY3 or \
+                sys.platform == 'linux' and PY3:
+            file_name = file_name[1:]
+        else:
+            # TODO: shortname option on MS-DOS machines
+            # :help :swapname
+            pass
+        self.file_name = os.path.join(dirp, file_name)
+        self.file = File(self)
+
+    def __lt__(self, other):
+
+        if self.file_name != other.file_name:
+            return self.file_name < other.file_name
+        if self.mtime is not None and other.mtime is not None:
+            # the newest first
+            return self.mtime > other.mtime
+        elif self.mtime is not None:
+            return False
+        else:
+            return True
+
+    __ne__ = lambda s, o: s != o
+    __gt__ = lambda s, o: not s < o and s != o
+
+    def __eq__(self, other):
+
+        return self.swap == other.swap
+
+    def __str__(self):
+        return self._swap
+
+    def __unicode__(self):
+        return self.swap
+
+    if PY3:
+        __str__ = __unicode__
+        del __unicode__
+
+    def check(self):
+        """
+        check if swap file is used by a process
+        """
+
+        for process in psutil.process_iter():
+            try:
+                files = process.get_open_files()
+            except psutil.AccessDenied:
+                files = []
+            except psutil.error.NoSuchProcess:
+                files = []
+            files = map(attrgetter('path'), files)
+            if not PY3:
+                files = map(lambda p: p.decode(encoding), files)
+            if self.swap in files:
+                return process
+
+    def read_swap(self):
+        """
+        Read a swap file into self._content.  Use NamedTemporaryFile.
+        """
+
+        tfile = tempfile.NamedTemporaryFile()
+        name = tfile.name
+        cmd = u'{0} -X -u NONE -r -c"w! {1}|q" {2}'.format(EDITOR, name, self.swap)
+        exit = subprocess.call(cmd, shell=True)
+        if exit != os.EX_OK:
+            e = SwapDecodeError(swap.swap)
+            e.exit = exit
+            raise e
+        self._content = tfile.read()
+        tfile.close()
+
+    def remove(self):
+        """
+        Delete the swap file.
+        """
+        if os.path.exists(self.swap):
+            os.remove(self.swap)
+            self.removed = True
+
+    @property
+    def content(self):
+        """
+        Return content of the swap file.
+        """
+
+        if hasattr(self, '_content'):
+            return self._content
+        else:
+            self.read_swap()
+            return self._content
+
+    @property
+    def is_modified(self):
+        """
+        Check if swap file differs from self.file.
+        """
+
+        return self.content != self.file.content
+
+    def format(self):
+
+        sname = format_path(self.swap)
+        if self.mtime:
+            return u'{0} ({1})'.format(
+                sname,
+                time.strftime('%x %X', time.localtime(self.mtime))
+            )
+        else:
+            return sname
+
+
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        dest='directories',
+        nargs='*',
+        default=(os.curdir,),
+        help='directory where to look for swap (by default current directory)',
+    )
+    parser.add_argument(
+        '-r', '-R', '--recursive',
+        dest='recursive',
+        action='store_true',
+        help='search directory recursively'
+    )
+    parser.add_argument(
+        '-f', '--find',
+        dest='find',
+        action='store_true',
+        help='only find swap files, it impiles -r',
+    )
+    parser.add_argument(
+        '-a', '--ask',
+        dest='ask',
+        action='store_true',
+        help='ask before deleting swap files which do not '
+             'differ from the associated file.',
+    )
+    args = parser.parse_args(sys.argv[1:])
+    if not hasattr(args, 'directories'):
+        setattr(args, 'directories', [os.path.abspath(os.curdir)])
+
+    if args.find:
+        args.recursive = True
+
+    swaps = defaultdict(list)
+    _swaps = []
+    swap_re = re.compile('\.sw[a-z]+$')
+    for dir_ in args.directories:
+        if args.recursive:
+            os.chdir(os.path.abspath(dir_))
+            for dirp, dirs, fns in os.walk(os.curdir):
+                for f in fns:
+                    if swap_re.search(f):
+                        swap = Swap(os.path.abspath(os.path.join(dirp, f)))
+                        heapq.heappush(swaps[swap.file_name], swap)
+
+        else:
+            os.chdir(os.path.abspath(dir_))
+            _swaps = filter(lambda f: swap_re.search(f), os.listdir(os.curdir))
+            if not PY3:
+                _swaps = map(lambda s: s.decode(encoding), _swaps)
+            for sp in _swaps:
+                swap = Swap(sp)
+                heapq.heappush(swaps[swap.file_name], swap)
+
+    del _swaps
+    os.chdir(CURDIR)
+
+    if swaps:
+        nr_swaps = reduce(lambda x, y: x + y, map(len, swaps.values()))
+    else:
+        nr_swaps = 0
+
+    if nr_swaps == 0:
+        print(u'No swap files found.')
+        sys.exit(os.EX_OK)
+    elif nr_swaps == 1:
+        print(u'Found: {0} swap file (mtime):'.format(unicode(nr_swaps)))
+    else:
+        print(u'Found: {0} swap files (mtime):'.format(unicode(nr_swaps)))
+    if not PY3:
+        _CURDIR = CURDIR.decode(encoding)
+    else:
+        _CURDIR = CURDIR
+    for p, sws in swaps.items():
+        sws = copy(sws)
+        while sws:
+            swap = heapq.heappop(sws)
+            print(u'  {0}'.format(swap.format()))
+    if args.find:
+        sys.exit(os.EX_OK)
+
+    # main loop
+    for file_name in swaps.keys():
+        sws = swaps[file_name]
+        len_sws = len(sws)
+        if len_sws > 1:
+            print(u"Multiple swap files for \"{0}\" (exit {1} with :cq to keep the "
+                  u"remaining ones)".format(format_path(swap.file_name), EDITOR))
+        delete = False
+        while sws:
+            # pop the youngest swap files first
+            swap = heapq.heappop(sws)
+            process = swap.check()
+            if process:
+                if process.terminal:
+                    terminal = u" on %s" % process.terminal.decode('utf-8')
+                else:
+                    terminal = u""
+                print(u'The "{0}" swap file is used by process {1} ({2}){3}.  '
+                      u'Skipping.'.format(swap, unicode(process.pid),
+                                          process.name.decode(encoding),
+                                          terminal))
+                continue
+
+            try:
+                swap.read_swap()
+            except SwapDecodeError as e:
+                print(u'Skipping {0}: {1} exited with error code {2}'.format(swap, EDITOR, unicode(e.exit)))
+                continue
+
+            if not swap.is_modified:
+                if args.ask:
+                    inp = input('The swap file "{0}" and "{1}" do not differ.'
+                                ' Do you want to delete it?  [Y/N]\n'
+                                .format(os.path.basename(swap._swap),
+                                        os.path.basename(swap.file_name))
+                                )
+                    inp = inp.lower()
+                    if inp in ('y', 'yes'):
+                        swap.remove()
+                else:
+                    print(u'Deleting "{0}" swap file (matching the content)'
+                          .format(swap))
+                    swap.remove()
+            else:
+                if len_sws > 1:
+                    # b:swapname is set for :FinishRecovery
+                    cmd = u'{0} -X +"call recover#DiffRecoveredFile()|let b:swapname=\'{1}\'" -r "{1}"'. \
+                        format(EDITOR, swap)
+                else:
+                    cmd = u'{0} -X "{1}"'.format(EDITOR, swap.file_name)
+                print(u'\n{0}'.format(cmd))
+                vim = subprocess.Popen(cmd, shell=True)
+                if vim.wait() != 0:
+                    break
+                elif len_sws > 1 and sws:
+                    inp = input('There are more swap files for "{0}", do'
+                                ' you want to delete them all? [Y/N]'.
+                                format(format_path(swap.file_name)))
+                    if inp.lower() in ('y', 'yes'):
+                        swap.remove()
+                        delete = True
+                        break
+        if delete and sws:
+            print(u'Deleting swap files:')
+            for swap in sws:
+                print(u'\t{0}'.format(format_path(swap.swap)))
+                swap.remove()
+
+    sys.exit(os.EX_OK)
