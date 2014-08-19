@@ -7,27 +7,6 @@
 " License: VIM License
 " GetLatestVimScripts: 3068 18 :AutoInstall: recover.vim
 "
-fu! recover#Recover(on) "{{{1
-    if a:on
-	if !exists("s:old_vsc")
-	    let s:old_vsc = v:swapchoice
-	endif
-	augroup Swap
-	    au!
-	    au SwapExists * nested :call recover#ConfirmSwapDiff()
-	    au BufWinEnter,InsertEnter,InsertLeave,FocusGained *
-			\ call <sid>CheckSwapFileExists()
-	augroup END
-    else
-	augroup Swap
-	    au!
-	augroup end
-	if exists("s:old_vsc")
-	    let v:swapchoice=s:old_vsc
-	endif
-    endif
-endfu
-
 fu! s:Swapname() "{{{1
     " Use sil! so a failing redir (e.g. recursive redir call)
     " won't hurt. (https://github.com/chrisbra/Recover.vim/pull/8)
@@ -39,7 +18,7 @@ fu! s:Swapname() "{{{1
     endif
 endfu
 
-fu! s:CheckSwapFileExists() "{{{1
+fu! recover#CheckSwapFileExists() "{{{1
     if !&swapfile
 	return
     endif
