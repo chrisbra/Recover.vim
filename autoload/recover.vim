@@ -323,7 +323,7 @@ fu! s:ModifySTL(enable) "{{{1
 endfu
 
 fu! s:SetSwapfile() "{{{1
-    if &l:swf
+    if &l:swf && !empty(bufname(''))
 	" Reset swapfile to use .swp extension
 	sil setl noswapfile swapfile
     endif
