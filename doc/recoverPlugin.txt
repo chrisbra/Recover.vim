@@ -170,6 +170,7 @@ third line of this document.
 - fix issue 30 (remove needless 2 second sleep,
   https://github.com/chrisbra/Recover.vim/issues/30,
   reported by Justin Keyes, thanks!)
+- only reset swapfile option, if the current buffer has a name
 
 0.18: Aug 14, 2013 "{{{1
 
