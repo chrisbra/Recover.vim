@@ -273,6 +273,7 @@ fu! recover#DiffRecoveredFile() "{{{1
     let b:swapbufnr = swapbufnr
     command! -buffer RecoverPluginFinish :FinishRecovery
     command! -buffer FinishRecovery :call recover#RecoverFinish()
+    command! -buffer RecoverPluginGet :1,$+1diffget|:FinishRecovery
     setl modified
 endfu
 
@@ -351,7 +352,7 @@ fu! recover#RecoverFinish() abort "{{{1
     exe bufwinnr(b:swapbufnr) " wincmd w"
     diffoff
     bd!
-    call delete(swapname)
+    call delete(fnameescape(swapname))
     diffoff
     call s:ModifySTL(0)
     exe bufwinnr(curbufnr) " wincmd w"

@@ -28,6 +28,14 @@ recovered file and the actual on disk version. The aim of this plugin is, to
 have an easy way to see differences, between the recovered files and the files
 stored on disk.
 
+By default, it will become only active, when a swap file is detected and
+enable you to see a diff of the recovered swapfile and the actual file. You
+can now use the commands |:RecoveryPluginGet| (to get all differences from the
+recovered swapfile) and |:RecoverPluginFinish|(to discard the swapfile
+changes) and close the diff mode. Thus those two commands work to easily
+discard the changes |:RecoveryPluginFinish| or to recover |:RecoveryPluginGet| 
+from the swapfile.
+
 Therefore this plugin sets up an auto command, that will create a diff buffer
 between the recovered file and the on-disk version of the same file. You can
 easily see, what has been changed and save your recovered work back to the
@@ -71,8 +79,8 @@ version and close the window, by issuing |:diffoff!| and |:close| in the
 window, that contains the on-disk version of the file. Be sure to save the
 recovered version of you file and afterwards you can safely remove the swap
 file.
-                                        *RecoverPluginFinish* *FinishRecovery*
-In the recovered window, the command >
+                                        *:RecoverPluginFinish* *:FinishRecovery*
+In the recovered buffer, the command >
     :FinishRecovery
 <
 deletes the swapfile closes the diff window and finishes everything up.
@@ -80,12 +88,19 @@ deletes the swapfile closes the diff window and finishes everything up.
 Alternatively you can also use the command >
     :RecoveryPluginFinish
 <
-                                                        *RecoverPluginHelp*
+                                                        *:RecoverPluginHelp*
 The command >
     :RecoverPluginHelp
 <
 show a small message, on what keys can be used to move to the next different
 region and how to merge the changes from one windo into the other.
+
+                                                        *:RecoverPluginGet*
+In the recovered buffer, the command >
+    :RecoverPluginGet
+<
+Will get all changes from the recovered swapfile put them in the buffer and
+finish diff mode off.
 
                                                        *RecovePlugin-config*
 If you want Vim to automatically edit any file that is open in another Vim
@@ -171,6 +186,9 @@ third line of this document.
   https://github.com/chrisbra/Recover.vim/issues/30,
   reported by Justin Keyes, thanks!)
 - only reset swapfile option, if the current buffer has a name
+- |:RecoverPluginGet| to easily get the recovered version into your buffer and
+  finish everything up (issue 31 https://github.com/chrisbra/Recover.vim/issues/31,
+  reported by luxigo, thanks!)
 
 0.18: Aug 14, 2013 "{{{1
 
