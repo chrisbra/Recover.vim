@@ -73,8 +73,14 @@ If you have said 'Diff', the plugin opens a new vertical splitt buffer. On the
 left side, you'll find the file as it is stored on disk and the right side
 will contain your recovered version of the file (using the found swap file).
 
-You can now use the |merge| commands to copy the contents to the buffer that
-holds your recovered version. If you are finished, you can close the diff
+When you want to keep the version from the swap file, use the command ":FinishRecovery"
+to close the diff view and delete the swapfile.
+
+When you want to discard the swap file, use the command ":%diffget" in the right window,
+then close the diff view and delete the swapfile with ":FinishRecovery".
+
+Alternatively you can use the |merge| commands to copy selected content to the buffer
+on the right that holds your recovered version. If you are finished, you can close the diff
 version and close the window, by issuing |:diffoff!| and |:close| in the
 window, that contains the on-disk version of the file. Be sure to save the
 recovered version of you file and afterwards you can safely remove the swap
