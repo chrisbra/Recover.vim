@@ -4,12 +4,12 @@ finish
 plugin/recover.vim	[[[1
 56
 " Vim plugin for diffing when swap file was found
-" Last Change: Wed, 14 Aug 2013 22:39:13 +0200
-" Version: 0.18
+" Last Change: Thu, 15 Jan 2015 21:26:55 +0100
+" Version: 0.19
 " Author: Christian Brabandt <cb@256bit.org>
 " Script:  http://www.vim.org/scripts/script.php?script_id=3068 
 " License: VIM License
-" GetLatestVimScripts: 3068 17 :AutoInstall: recover.vim
+" GetLatestVimScripts: 3068 18 :AutoInstall: recover.vim
 " Documentation: see :h recoverPlugin.txt
 
 " ---------------------------------------------------------------------
@@ -64,11 +64,11 @@ autoload/recover.vim	[[[1
 " Vim plugin for diffing when swap file was found
 " ---------------------------------------------------------------
 " Author: Christian Brabandt <cb@256bit.org>
-" Version: 0.18
-" Last Change: Wed, 14 Aug 2013 22:39:13 +0200
+" Version: 0.19
+" Last Change: Thu, 15 Jan 2015 21:26:55 +0100
 " Script:  http://www.vim.org/scripts/script.php?script_id=3068
 " License: VIM License
-" GetLatestVimScripts: 3068 18 :AutoInstall: recover.vim
+" GetLatestVimScripts: 3068 19 :AutoInstall: recover.vim
 "
 fu! s:Swapname() "{{{1
     " Use sil! so a failing redir (e.g. recursive redir call)
@@ -264,7 +264,6 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	" Don't show the Recovery dialog
 	let v:swapchoice='o'
 	call <sid>EchoMsg("Found SwapFile, opening file readonly!")
-	sleep 2
     elseif p == 4
 	" Recover
 	let v:swapchoice='r'
@@ -337,6 +336,7 @@ fu! recover#DiffRecoveredFile() "{{{1
     let b:swapbufnr = swapbufnr
     command! -buffer RecoverPluginFinish :FinishRecovery
     command! -buffer FinishRecovery :call recover#RecoverFinish()
+    command! -buffer RecoverPluginGet :1,$+1diffget|:FinishRecovery
     setl modified
 endfu
 
@@ -387,7 +387,7 @@ fu! s:ModifySTL(enable) "{{{1
 endfu
 
 fu! s:SetSwapfile() "{{{1
-    if &l:swf
+    if &l:swf && !empty(bufname(''))
 	" Reset swapfile to use .swp extension
 	sil setl noswapfile swapfile
     endif
@@ -415,7 +415,7 @@ fu! recover#RecoverFinish() abort "{{{1
     exe bufwinnr(b:swapbufnr) " wincmd w"
     diffoff
     bd!
-    call delete(swapname)
+    call delete(fnameescape(swapname))
     diffoff
     call s:ModifySTL(0)
     exe bufwinnr(curbufnr) " wincmd w"
@@ -481,11 +481,11 @@ endfu
 " Modeline "{{{1
 " vim:fdl=0
 doc/recoverPlugin.txt	[[[1
-306
+336
 *recover.vim*   Show differences for recovered files
 
 Author:  Christian Brabandt <cb@256bit.org>
-Version: 0.18 Wed, 14 Aug 2013 22:39:13 +0200
+Version: 0.19 Thu, 15 Jan 2015 21:26:55 +0100
 Copyright: (c) 2009, 2010, 2011, 2012, 2013 by Christian Brabandt
            The VIM LICENSE applies to recoverPlugin.vim and recoverPlugin.txt
            (see |copyright|) except use recoverPlugin instead of "Vim".
@@ -511,6 +511,14 @@ When using |recovery|, it is hard to tell, what has been changed between the
 recovered file and the actual on disk version. The aim of this plugin is, to
 have an easy way to see differences, between the recovered files and the files
 stored on disk.
+
+By default, it will become only active, when a swap file is detected and
+enable you to see a diff of the recovered swapfile and the actual file. You
+can now use the commands |:RecoveryPluginGet| (to get all differences from the
+recovered swapfile) and |:RecoverPluginFinish|(to discard the swapfile
+changes) and close the diff mode. Thus those two commands work to easily
+discard the changes |:RecoveryPluginFinish| or to recover |:RecoveryPluginGet| 
+from the swapfile.
 
 Therefore this plugin sets up an auto command, that will create a diff buffer
 between the recovered file and the on-disk version of the same file. You can
@@ -549,14 +557,22 @@ If you have said 'Diff', the plugin opens a new vertical splitt buffer. On the
 left side, you'll find the file as it is stored on disk and the right side
 will contain your recovered version of the file (using the found swap file).
 
-You can now use the |merge| commands to copy the contents to the buffer that
-holds your recovered version. If you are finished, you can close the diff
+When you want to keep the version from the swap file, use the command ":FinishRecovery"
+to close the diff view and delete the swapfile.
+
+When you want to discard the swap file, use the command ":1,$+1diffget" in the right window,
+then close the diff view and delete the swapfile with |:FinishRecovery|. You
+can also use the command |:RecoveryPluginGet|, which will automatically
+retrieve all changes and finish recovery.
+
+Alternatively you can use the |merge| commands to copy selected content to the buffer
+on the right that holds your recovered version. If you are finished, you can close the diff
 version and close the window, by issuing |:diffoff!| and |:close| in the
 window, that contains the on-disk version of the file. Be sure to save the
 recovered version of you file and afterwards you can safely remove the swap
 file.
-                                        *RecoverPluginFinish* *FinishRecovery*
-In the recovered window, the command >
+                                        *:RecoverPluginFinish* *:FinishRecovery*
+In the recovered buffer, the command >
     :FinishRecovery
 <
 deletes the swapfile closes the diff window and finishes everything up.
@@ -564,12 +580,19 @@ deletes the swapfile closes the diff window and finishes everything up.
 Alternatively you can also use the command >
     :RecoveryPluginFinish
 <
-                                                        *RecoverPluginHelp*
+                                                        *:RecoverPluginHelp*
 The command >
     :RecoverPluginHelp
 <
 show a small message, on what keys can be used to move to the next different
 region and how to merge the changes from one windo into the other.
+
+                                                        *:RecoverPluginGet*
+In the recovered buffer, the command >
+    :RecoverPluginGet
+<
+Will get all changes from the recovered swapfile put them in the buffer and
+finish diff mode off.
 
                                                        *RecovePlugin-config*
 If you want Vim to automatically edit any file that is open in another Vim
@@ -647,10 +670,17 @@ third line of this document.
 ==============================================================================
 5. recover History                                          *recover-history*
 
-0.19: (unreleased) "{{{1
+0.19: Jan 15, 2015 "{{{1
 - fix issue 29 (plugin always loaded autoload part, 
   https://github.com/chrisbra/Recover.vim/issues/29,
   reported by Justin Keyes, thanks!)
+- fix issue 30 (remove needless 2 second sleep,
+  https://github.com/chrisbra/Recover.vim/issues/30,
+  reported by Justin Keyes, thanks!)
+- only reset swapfile option, if the current buffer has a name
+- |:RecoverPluginGet| to easily get the recovered version into your buffer and
+  finish everything up (issue 31 https://github.com/chrisbra/Recover.vim/issues/31,
+  reported by luxigo, thanks!)
 
 0.18: Aug 14, 2013 "{{{1
 

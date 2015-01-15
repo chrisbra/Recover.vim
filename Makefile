@@ -9,7 +9,10 @@ VERSION=$(shell sed -n '/Version:/{s/^.*\(\S\.\S\+\)$$/\1/;p}' $(SCRIPT))
 
 all: vimball
 
-vimball: $(PLUGIN).vmb
+vimball: $(SCRIPT) $(AUTOL) $(DOC) $(PLUGIN).vmb
+	rm -f $(PLUGIN)-$(VERSION).vmb
+	vim -N -u NONE -c 'ru! plugin/vimballPlugin.vim' -c ':call append("0", [ "$(SCRIPT)", "$(AUTOL)", "$(DOC)", "$(CVIM)"])' -c '$$d' -c ":%MkVimball $(PLUGIN)-$(VERSION)  ." -c':q!'
+	ln -f $(PLUGIN)-$(VERSION).vmb $(PLUGIN).vmb
 
 clean:
 	find . -type f \( -name "*.vba" -o -name "*.orig" -o -name "*.~*" \
@@ -26,11 +29,6 @@ uninstall:
 
 undo:
 	for i in */*.orig; do mv -f "$$i" "$${i%.*}"; done
-
-$(PLUGIN).vmb:
-	rm -f $(PLUGIN)-$(VERSION).vmb
-	vim -N -u NONE -c 'ru! plugin/vimballPlugin.vim' -c ':call append("0", [ "$(SCRIPT)", "$(AUTOL)", "$(DOC)", "$(CVIM)"])' -c '$$d' -c ":%MkVimball $(PLUGIN)-$(VERSION)  ." -c':q!'
-	ln -f $(PLUGIN)-$(VERSION).vmb $(PLUGIN).vmb
 
 release: version all
 

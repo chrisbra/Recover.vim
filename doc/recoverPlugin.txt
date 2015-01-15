@@ -1,7 +1,7 @@
 *recover.vim*   Show differences for recovered files
 
 Author:  Christian Brabandt <cb@256bit.org>
-Version: 0.18 Wed, 14 Aug 2013 22:39:13 +0200
+Version: 0.19 Thu, 15 Jan 2015 21:26:55 +0100
 Copyright: (c) 2009, 2010, 2011, 2012, 2013 by Christian Brabandt
            The VIM LICENSE applies to recoverPlugin.vim and recoverPlugin.txt
            (see |copyright|) except use recoverPlugin instead of "Vim".
@@ -186,7 +186,7 @@ third line of this document.
 ==============================================================================
 5. recover History                                          *recover-history*
 
-0.19: (unreleased) "{{{1
+0.19: Jan 15, 2015 "{{{1
 - fix issue 29 (plugin always loaded autoload part, 
   https://github.com/chrisbra/Recover.vim/issues/29,
   reported by Justin Keyes, thanks!)
