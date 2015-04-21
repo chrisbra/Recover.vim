@@ -177,7 +177,7 @@ class Swap(object):
 
         tfile = tempfile.NamedTemporaryFile()
         name = tfile.name
-        cmd = u'{0} -X -u NONE -r -c"w! {1}|q" {2}'.format(EDITOR, name, self.swap)
+        cmd = u'{0} -X -u NONE -r -c"w! {1}|q" "{2}"'.format(EDITOR, name, self.swap)
         exit = subprocess.call(cmd, shell=True)
         if exit != os.EX_OK:
             e = SwapDecodeError(swap.swap)
@@ -263,8 +263,9 @@ if __name__ == '__main__':
 
     swaps = defaultdict(list)
     _swaps = []
-    # Skip .swf files as these are usually for Flash
-    # TODO: print some warning
+
+    # Note: this will skip .swf files as these are usually Flash content
+    # TODO: print some warning when a *.swf file is found
     swap_re = re.compile('\.sw[a-eg-z]+$')
     for dir_ in args.directories:
         if args.recursive:
