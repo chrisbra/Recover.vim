@@ -350,6 +350,8 @@ if __name__ == '__main__':
                     inp = inp.lower()
                     if inp in ('y', 'yes'):
                         swap.remove()
+                    else:
+                        print('Skipping removal')
                 else:
                     print(u'Deleting "{0}" swap file (matching the content)'
                           .format(swap))
@@ -373,6 +375,8 @@ if __name__ == '__main__':
                         swap.remove()
                         delete = True
                         break
+                    else:
+                        print('Skipping removal')
         if delete and sws:
             print(u'Deleting swap files:')
             for swap in sws:

@@ -186,6 +186,11 @@ third line of this document.
 ==============================================================================
 5. recover History                                          *recover-history*
 
+0.20: (unreleased)
+- Several fixes for |cvim|
+  (contributed by Mateusz Jończyk,
+  https://github.com/chrisbra/Recover.vim/pull/35, thanks!)
+
 0.19: Jan 15, 2015 "{{{1
 - fix issue 29 (plugin always loaded autoload part, 
   https://github.com/chrisbra/Recover.vim/issues/29,
