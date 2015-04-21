@@ -263,7 +263,9 @@ if __name__ == '__main__':
 
     swaps = defaultdict(list)
     _swaps = []
-    swap_re = re.compile('\.sw[a-z]+$')
+    # Skip .swf files as these are usually for Flash
+    # TODO: print some warning
+    swap_re = re.compile('\.sw[a-eg-z]+$')
     for dir_ in args.directories:
         if args.recursive:
             os.chdir(os.path.abspath(dir_))
