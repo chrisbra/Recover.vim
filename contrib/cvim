@@ -251,8 +251,7 @@ if __name__ == '__main__':
         '-a', '--ask',
         dest='ask',
         action='store_true',
-        help='ask before deleting swap files which do not '
-             'differ from the associated file.',
+        help='ask before deleting any swap files.'
     )
     args = parser.parse_args(sys.argv[1:])
     if not hasattr(args, 'directories'):
@@ -343,8 +342,8 @@ if __name__ == '__main__':
 
             if not swap.is_modified:
                 if args.ask:
-                    inp = input('The swap file "{0}" and "{1}" do not differ.'
-                                ' Do you want to delete it?  [Y/N]\n'
+                    inp = input('The swap file "{0}" and "{1}" have the same content.'
+                                ' Do you want to delete "{0}"?  [Y/N]\n'
                                 .format(os.path.basename(swap._swap),
                                         os.path.basename(swap.file_name))
                                 )
