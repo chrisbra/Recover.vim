@@ -53,10 +53,15 @@ class StdOut(object):
 
 
     def write(self, s):
+        if sys.stdout.isatty():
+            default_encoding = sys.stdout.encoding
+        else:
+            default_encoding = locale.getpreferredencoding()
+
         if isinstance(s, unicode):
-            s = s.encode(self.encoding)
+            s = s.encode(default_encoding)
         if isinstance(s, bytes):
-            s = s.decode(self.encoding)
+            s = s.decode(default_encoding)
         sys.__stdout__.write(s)
 
 
