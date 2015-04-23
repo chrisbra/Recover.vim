@@ -268,9 +268,8 @@ if __name__ == '__main__':
     swaps = defaultdict(list)
     _swaps = []
 
-    # Note: this will skip .swf files as these are usually Flash content
-    # TODO: print some warning when a *.swf file is found
-    swap_re = re.compile('\.sw[a-eg-z]+$')
+    # Note: also find .swf files
+    swap_re = re.compile('(\.[^/]+)?\.sw[a-z]+$')
     for dir_ in args.directories:
         if args.recursive:
             os.chdir(os.path.abspath(dir_))
