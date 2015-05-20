@@ -107,8 +107,9 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	  let wincmd = printf('-c "redir > %s|1d|:q!" ', tfile)
 	  let wincmd = printf('-c "call feedkeys(\"o\n\e:q!\n\")"')
 	endif
-	let cmd = printf("%svim -u NONE -es -V %s %s",
-	    \ (s:isWin() ? '' : 'TERM=vt100 LC_ALL=C '),
+	let cmd = printf("%s %s -u NONE -es -V %s %s",
+	    \ (s:isWin() ? '' : 'TERM=vt100 LC_ALL=C'),
+	    \ v:progpath,
 	    \ (s:isWin() ? wincmd : ''),
 	    \ bufname)
 	let msg = system(cmd)
@@ -142,7 +143,8 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	if s:isWin()
 	    let tfile = substitute(tfile, '/', '\\', 'g')
 	endif
-	let cmd = printf("vim -u NONE -N %s -r %s -c \":w %s|:q!\" %s diff %s %s",
+	let cmd = printf("%s -u NONE -N %s -r %s -c \":w %s|:q!\" %s diff %s %s",
+		    \ v:progpath,
 		    \ (s:isWin() ? '' : '-es'),
 		    \ (s:isWin() ? fnamemodify(v:swapname, ':p:8') : shellescape(v:swapname)),
 		    \ tfile, (s:isWin() ? '&' : '&&'),

@@ -190,6 +190,9 @@ third line of this document.
 - Several fixes for |cvim|
   (contributed by Mateusz Jończyk,
   https://github.com/chrisbra/Recover.vim/pull/35, thanks!)
+- Don't assume vim when parsing Swap file dialog
+  (contributed by Michael Reed, 
+  https://github.com/chrisbra/Recover.vim/pull/36, thanks!)
 
 0.19: Jan 15, 2015 "{{{1
 - fix issue 29 (plugin always loaded autoload part, 
