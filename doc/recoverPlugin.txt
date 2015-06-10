@@ -193,6 +193,9 @@ third line of this document.
 - Don't assume vim when parsing Swap file dialog
   (contributed by Michael Reed, 
   https://github.com/chrisbra/Recover.vim/pull/36, thanks!)
+- Check for existence of |v:progpath| before using it (reported by 
+  Dmytro Kolomoiets, https://github.com/chrisbra/Recover.vim/issues/37,
+  thanks!)
 
 0.19: Jan 15, 2015 "{{{1
 - fix issue 29 (plugin always loaded autoload part, 
