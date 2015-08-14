@@ -357,7 +357,7 @@ fu! recover#RecoverFinish() abort "{{{1
     exe bufwinnr(b:swapbufnr) " wincmd w"
     diffoff
     bd!
-    call delete(fnameescape(swapname))
+    call delete(swapname)
     diffoff
     call s:ModifySTL(0)
     exe bufwinnr(curbufnr) " wincmd w"
