@@ -118,6 +118,14 @@ g:RecoverPlugin_Edit_Unmodified to 1 like this in your |.vimrc| >
     :let g:RecoverPlugin_Edit_Unmodified = 1
 <
 Note: This only works on Linux.
+
+If you do not want Vim to examine the existing swapfile and figure out things
+like whether the file is unmodified in another Vim process and to check the
+process id, then you need to set the configuration variable
+g:RecoverPlugin_Examine_Swapfile to 1 like this in your |.vimrc| >
+
+    :let g:RecoverPlugin_No_Check_Swapfile = 1
+
                                                         *RecoverPlugin-misc*
 If your Vim was built with |+balloon_eval|, recover.vim will also set up an
 balloon expression, that shows you, which buffer contains the recovered
