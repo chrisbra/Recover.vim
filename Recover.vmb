@@ -60,7 +60,7 @@ unlet s:keepcpo
 " Modeline {{{1
 " vim: fdm=marker sw=2 sts=2 ts=8 fdl=0
 autoload/recover.vim	[[[1
-419
+425
 " Vim plugin for diffing when swap file was found
 " ---------------------------------------------------------------
 " Author: Christian Brabandt <cb@256bit.org>
@@ -70,6 +70,9 @@ autoload/recover.vim	[[[1
 " License: VIM License
 " GetLatestVimScripts: 3068 19 :AutoInstall: recover.vim
 "
+
+let s:progpath=(v:version > 704 || (v:version == 704 && has("patch234")) ? v:progpath : 'vim')
+
 fu! s:Swapname() "{{{1
     " Use sil! so a failing redir (e.g. recursive redir call)
     " won't hurt. (https://github.com/chrisbra/Recover.vim/pull/8)
@@ -155,23 +158,24 @@ fu! recover#ConfirmSwapDiff() "{{{1
     endif
     call s:ModifySTL(1)
     let delete = 0
-    let do_modification_check = exists("g:RecoverPlugin_Edit_Unmodified") ? g:RecoverPlugin_Edit_Unmodified : 0
+    let do_modification_check = get(g:, 'RecoverPlugin_Edit_Unmodified', 0)
     let not_modified = 0
     let msg = ""
     let bufname = s:isWin() ? fnamemodify(expand('%'), ':p:8') : shellescape(expand('%'))
     let tfile = tempname()
-    if executable('vim') && !s:isWin() && !s:isMacTerm()
+    if executable('vim') && !s:isWin() && !s:isMacTerm() && !get(g:, 'RecoverPlugin_No_Check_Swapfile', 0)
 	" Doesn't work on windows (system() won't be able to fetch the output)
 	" and Mac Terminal (issue #24)  
 	" Capture E325 Warning message
 	" Leave English output, so parsing will be easier
 	" TODO: make it work on windows.
-	if s:isWin()
-	  let wincmd = printf('-c "redir > %s|1d|:q!" ', tfile)
-	  let wincmd = printf('-c "call feedkeys(\"o\n\e:q!\n\")"')
-	endif
-	let cmd = printf("%svim -u NONE -es -V %s %s",
-	    \ (s:isWin() ? '' : 'TERM=vt100 LC_ALL=C '),
+	" if s:isWin()
+	"   let wincmd = printf('-c "redir > %s|1d|:q!" ', tfile)
+	"   let wincmd = printf('-c "call feedkeys(\"o\n\e:q!\n\")"')
+	" endif
+	let cmd = printf("%s %s -u NONE -es -V %s %s",
+	    \ (s:isWin() ? '' : 'TERM=vt100 LC_ALL=C'),
+	    \ s:progpath,
 	    \ (s:isWin() ? wincmd : ''),
 	    \ bufname)
 	let msg = system(cmd)
@@ -199,13 +203,15 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	    endif
 	endif
     endif
+    " Show modification message and present user question about what to do:
     if executable('vim') && executable('diff') "&& s:isWin()
 	" Check, whether the files differ issue #7
 	" doesn't work on Windows? (cmd is ok, should be executable)
 	if s:isWin()
 	    let tfile = substitute(tfile, '/', '\\', 'g')
 	endif
-	let cmd = printf("vim -u NONE -N %s -r %s -c \":w %s|:q!\" %s diff %s %s",
+	let cmd = printf("%s -u NONE -N %s -r %s -c \":w %s|:q!\" %s diff %s %s",
+		    \ s:progpath,
 		    \ (s:isWin() ? '' : '-es'),
 		    \ (s:isWin() ? fnamemodify(v:swapname, ':p:8') : shellescape(v:swapname)),
 		    \ tfile, (s:isWin() ? '&' : '&&'),
@@ -415,7 +421,7 @@ fu! recover#RecoverFinish() abort "{{{1
     exe bufwinnr(b:swapbufnr) " wincmd w"
     diffoff
     bd!
-    call delete(fnameescape(swapname))
+    call delete(swapname)
     diffoff
     call s:ModifySTL(0)
     exe bufwinnr(curbufnr) " wincmd w"
@@ -481,7 +487,7 @@ endfu
 " Modeline "{{{1
 " vim:fdl=0
 doc/recoverPlugin.txt	[[[1
-336
+357
 *recover.vim*   Show differences for recovered files
 
 Author:  Christian Brabandt <cb@256bit.org>
@@ -602,6 +608,14 @@ g:RecoverPlugin_Edit_Unmodified to 1 like this in your |.vimrc| >
     :let g:RecoverPlugin_Edit_Unmodified = 1
 <
 Note: This only works on Linux.
+
+If you do not want Vim to examine the existing swapfile and figure out things
+like whether the file is unmodified in another Vim process and to check the
+process id, then you need to set the configuration variable
+g:RecoverPlugin_Examine_Swapfile to 1 like this in your |.vimrc| >
+
+    :let g:RecoverPlugin_No_Check_Swapfile = 1
+
                                                         *RecoverPlugin-misc*
 If your Vim was built with |+balloon_eval|, recover.vim will also set up an
 balloon expression, that shows you, which buffer contains the recovered
@@ -669,6 +683,19 @@ third line of this document.
 
 ==============================================================================
 5. recover History                                          *recover-history*
+
+0.20: (unreleased)
+- Several fixes for |cvim|
+  (contributed by Mateusz Jończyk,
+  https://github.com/chrisbra/Recover.vim/pull/35, thanks!)
+- Don't assume vim when parsing Swap file dialog
+  (contributed by Michael Reed, 
+  https://github.com/chrisbra/Recover.vim/pull/36, thanks!)
+- Check for existence of |v:progpath| before using it (reported by 
+  Dmytro Kolomoiets, https://github.com/chrisbra/Recover.vim/issues/37,
+  thanks!)
+- Fix issue #38 (https://github.com/chrisbra/Recover.vim/issues/38, reported
+  by PhilRunninger, thanks!)
 
 0.19: Jan 15, 2015 "{{{1
 - fix issue 29 (plugin always loaded autoload part, 
@@ -819,7 +846,7 @@ third line of this document.
 Modeline: "{{{1
 vim:tw=78:ts=8:ft=help:et:fdm=marker:fdl=0:norl
 contrib/cvim	[[[1
-380
+390
 #!/usr/bin/env python
 # -%- coding: utf-8 -%-
 # Author: Marcin Szamotulski
@@ -875,10 +902,15 @@ class StdOut(object):
 
 
     def write(self, s):
+        if sys.stdout.isatty():
+            default_encoding = sys.stdout.encoding
+        else:
+            default_encoding = locale.getpreferredencoding()
+
         if isinstance(s, unicode):
-            s = s.encode(self.encoding)
+            s = s.encode(default_encoding)
         if isinstance(s, bytes):
-            s = s.decode(self.encoding)
+            s = s.decode(default_encoding)
         sys.__stdout__.write(s)
 
 
@@ -999,7 +1031,7 @@ class Swap(object):
 
         tfile = tempfile.NamedTemporaryFile()
         name = tfile.name
-        cmd = u'{0} -X -u NONE -r -c"w! {1}|q" {2}'.format(EDITOR, name, self.swap)
+        cmd = u'{0} -X -u NONE -r -c"w! {1}|q" "{2}"'.format(EDITOR, name, self.swap)
         exit = subprocess.call(cmd, shell=True)
         if exit != os.EX_OK:
             e = SwapDecodeError(swap.swap)
@@ -1073,8 +1105,7 @@ if __name__ == '__main__':
         '-a', '--ask',
         dest='ask',
         action='store_true',
-        help='ask before deleting swap files which do not '
-             'differ from the associated file.',
+        help='ask before deleting any swap files.'
     )
     args = parser.parse_args(sys.argv[1:])
     if not hasattr(args, 'directories'):
@@ -1085,7 +1116,9 @@ if __name__ == '__main__':
 
     swaps = defaultdict(list)
     _swaps = []
-    swap_re = re.compile('\.sw[a-z]+$')
+
+    # Note: also find .swf files
+    swap_re = re.compile('(\.[^/]+)?\.sw[a-z]+$')
     for dir_ in args.directories:
         if args.recursive:
             os.chdir(os.path.abspath(dir_))
@@ -1162,14 +1195,16 @@ if __name__ == '__main__':
 
             if not swap.is_modified:
                 if args.ask:
-                    inp = input('The swap file "{0}" and "{1}" do not differ.'
-                                ' Do you want to delete it?  [Y/N]\n'
+                    inp = input('The swap file "{0}" and "{1}" have the same content.'
+                                ' Do you want to delete "{0}"?  [Y/N]\n'
                                 .format(os.path.basename(swap._swap),
                                         os.path.basename(swap.file_name))
                                 )
                     inp = inp.lower()
                     if inp in ('y', 'yes'):
                         swap.remove()
+                    else:
+                        print('Skipping removal')
                 else:
                     print(u'Deleting "{0}" swap file (matching the content)'
                           .format(swap))
@@ -1193,6 +1228,8 @@ if __name__ == '__main__':
                         swap.remove()
                         delete = True
                         break
+                    else:
+                        print('Skipping removal')
         if delete and sws:
             print(u'Deleting swap files:')
             for swap in sws:
