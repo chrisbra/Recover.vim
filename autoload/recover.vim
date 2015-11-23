@@ -106,10 +106,10 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	" Capture E325 Warning message
 	" Leave English output, so parsing will be easier
 	" TODO: make it work on windows.
-	if s:isWin()
-	  let wincmd = printf('-c "redir > %s|1d|:q!" ', tfile)
-	  let wincmd = printf('-c "call feedkeys(\"o\n\e:q!\n\")"')
-	endif
+	" if s:isWin()
+	"   let wincmd = printf('-c "redir > %s|1d|:q!" ', tfile)
+	"   let wincmd = printf('-c "call feedkeys(\"o\n\e:q!\n\")"')
+	" endif
 	let cmd = printf("%s %s -u NONE -es -V %s %s",
 	    \ (s:isWin() ? '' : 'TERM=vt100 LC_ALL=C'),
 	    \ s:progpath,
