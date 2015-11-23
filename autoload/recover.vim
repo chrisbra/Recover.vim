@@ -95,7 +95,7 @@ fu! recover#ConfirmSwapDiff() "{{{1
     endif
     call s:ModifySTL(1)
     let delete = 0
-    let do_modification_check = exists("g:RecoverPlugin_Edit_Unmodified") ? g:RecoverPlugin_Edit_Unmodified : 0
+    let do_modification_check = get(g:, 'RecoverPlugin_Edit_Unmodified', 0)
     let not_modified = 0
     let msg = ""
     let bufname = s:isWin() ? fnamemodify(expand('%'), ':p:8') : shellescape(expand('%'))
