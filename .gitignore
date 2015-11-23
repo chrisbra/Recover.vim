@@ -10,3 +10,5 @@ vim_passfile
 # ignore *.orig files
 *.orig
 test/*/*
+# tags file
+doc/tags
