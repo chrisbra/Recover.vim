@@ -140,6 +140,7 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	    endif
 	endif
     endif
+    " Show modification message and present user question about what to do:
     if executable('vim') && executable('diff') "&& s:isWin()
 	" Check, whether the files differ issue #7
 	" doesn't work on Windows? (cmd is ok, should be executable)
