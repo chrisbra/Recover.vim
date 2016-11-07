@@ -110,14 +110,19 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	"   let wincmd = printf('-c "redir > %s|1d|:q!" ', tfile)
 	"   let wincmd = printf('-c "call feedkeys(\"o\n\e:q!\n\")"')
 	" endif
-	let cmd = printf("%s %s -i NONE -u NONE -es -V %s %s",
-	    \ (s:isWin() ? '' : 'TERM=vt100 LC_ALL=C'),
+	let t = tempname()
+	let cmd = printf("%s %s -i NONE -u NONE -es -V0%s %s %s",
+	    \ (s:isWin() ? '' : 'LC_ALL=C'),
 	    \ s:progpath,
+	    \ t,
 	    \ (s:isWin() ? wincmd : ''),
 	    \ bufname)
-	let msg = system(cmd)
-	let msg = substitute(msg, '.*\(E325.*process ID:.\{-}\)\%x0d.*', '\1', '')
-	let msg = substitute(msg, "\e\\[\\d\\+C", "", "g")
+	call system(cmd)
+	let msg = readfile(t)
+	call delete(t)
+	let end_of_first_par = match(msg, "^$", 2) " output starts with empty line: find 2nd one
+	let msg = msg[1:end_of_first_par] " get relevant part of output
+	let msg = join(msg, "\n")
 	if do_modification_check
 	    let not_modified = (match(msg, "modified: no") > -1)
 	endif
