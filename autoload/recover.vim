@@ -100,7 +100,7 @@ fu! recover#ConfirmSwapDiff() "{{{1
     let msg = ""
     let bufname = s:isWin() ? fnamemodify(expand('%'), ':p:8') : shellescape(expand('%'))
     let tfile = tempname()
-    if executable('vim') && !s:isWin() && !s:isMacTerm() && !get(g:, 'RecoverPlugin_No_Check_Swapfile', 0)
+    if executable(v:progpath) && !s:isWin() && !s:isMacTerm() && !get(g:, 'RecoverPlugin_No_Check_Swapfile', 0)
 	" Doesn't work on windows (system() won't be able to fetch the output)
 	" and Mac Terminal (issue #24)  
 	" Capture E325 Warning message
@@ -146,7 +146,7 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	endif
     endif
     " Show modification message and present user question about what to do:
-    if executable('vim') && executable('diff') "&& s:isWin()
+    if executable(v:progpath) && executable('diff') "&& s:isWin()
 	" Check, whether the files differ issue #7
 	" doesn't work on Windows? (cmd is ok, should be executable)
 	if s:isWin()
