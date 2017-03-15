@@ -170,11 +170,11 @@ fu! recover#ConfirmSwapDiff() "{{{1
       \ (s:isWin() ? '' : 'LC_ALL=C'), s:progpath, t,
       \ (s:isWin() ? wincmd : ''), bufname)
     call system(cmd)
-    let msg = readfile(t)
+    let msgl = readfile(t)
     call delete(t)
-    let end_of_first_par = match(msg, "^$", 2) " output starts with empty line: find 2nd one
-    let msg = msg[1:end_of_first_par] " get relevant part of output
-    let msg = join(msg, "\n")
+    let end_of_first_par = match(msgl, "^$", 2) " output starts with empty line: find 2nd one
+    let msgl = msgl[1:end_of_first_par] " get relevant part of output
+    let msg = join(msgl, "\n")
     let not_modified = (match(msg, "modified: no") > -1)
   endif
   if has("unix") && !empty(msg) && system("uname") =~? "linux"
