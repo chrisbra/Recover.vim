@@ -161,7 +161,15 @@ fu! recover#ConfirmSwapDiff() "{{{1
 		    \ bufname, tfile)
 	call system(cmd)
 	" if return code of diff is zero, files are identical
-	let delete = !v:shell_error
+        if !v:shell_error
+                " only delete, if the file is not already open in another Vim
+                " instance
+                if  exists("pname") && pname =~? 'vim'
+                        let delete = 0
+                else
+                        let delete = 1
+                endif
+        endif
 	if !do_modification_check
 	    echo msg
 	endif
