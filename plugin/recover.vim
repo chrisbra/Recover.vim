@@ -17,27 +17,25 @@ let s:keepcpo          = &cpo
 set cpo&vim
 
 fu! s:Recover(on) "{{{1
-    if a:on
-	if !exists("s:old_vsc")
-	    let s:old_vsc = v:swapchoice
-	endif
-	augroup Swap
-	    au!
-	    au SwapExists * nested :call recover#ConfirmSwapDiff()
-	    au BufWinEnter,InsertEnter,InsertLeave,FocusGained *
-			\ call recover#CheckSwapFileExists()
-	augroup END
-    else
-	augroup Swap
-	    au!
-	augroup end
-	if exists("s:old_vsc")
-	    let v:swapchoice=s:old_vsc
-	endif
+  if a:on
+    if !exists("s:old_vsc")
+      let s:old_vsc = v:swapchoice
     endif
+    augroup Swap
+      au!
+      au SwapExists * nested :call recover#ConfirmSwapDiff()
+      au BufWinEnter,InsertEnter,InsertLeave,FocusGained *
+                  \ call recover#CheckSwapFileExists()
+    augroup END
+  else
+    augroup Swap
+      au!
+    augroup end
+    if exists("s:old_vsc")
+      let v:swapchoice=s:old_vsc
+    endif
+  endif
 endfu
-
-
 " ---------------------------------------------------------------------
 " Public Interface {{{1
 " Define User-Commands and Autocommand "{{{
@@ -46,11 +44,9 @@ call s:Recover(1)
 com! RecoverPluginEnable  :call s:Recover(1)
 com! RecoverPluginDisable :call s:Recover(0)
 com! RecoverPluginHelp    :call recover#Help()
-
 " =====================================================================
 " Restoration And Modelines: {{{1
 let &cpo= s:keepcpo
 unlet s:keepcpo
-
 " Modeline {{{1
-" vim: fdm=marker sw=2 sts=2 ts=8 fdl=0
+" vim: fdm=marker fdl=0 ts=2 et sw=0 sts=-1
