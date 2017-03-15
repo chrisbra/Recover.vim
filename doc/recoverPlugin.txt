@@ -125,7 +125,14 @@ process id, then you need to set the configuration variable
 g:RecoverPlugin_Examine_Swapfile to 1 like this in your |.vimrc| >
 
     :let g:RecoverPlugin_No_Check_Swapfile = 1
+<
+If you Vim to silently delete unmodified swapfiles, that are not being edited
+in another session, set the variable g:RecoverPlugin_Delete_Unmodified Swapfile
+to 1 like this in your |.vimrc| >
 
+    :let g:RecoverPlugin_Delete_Unmodified_Swapfile = 1
+<
+Note: This only works on Linux.
                                                         *RecoverPlugin-misc*
 If your Vim was built with |+balloon_eval|, recover.vim will also set up an
 balloon expression, that shows you, which buffer contains the recovered
@@ -206,6 +213,10 @@ third line of this document.
   thanks!)
 - Fix issue #38 (https://github.com/chrisbra/Recover.vim/issues/38, reported
   by PhilRunninger, thanks!)
+- If g:RecoverPlugin_Delete_Unmodified_Swapfile is set, delete unmodifed
+  swapfiles that are not edited in another Vim buffer.
+  (https://github.com/chrisbra/Recover.vim/issues/46, reported by Astara,
+  thanks!)
 
 0.19: Jan 15, 2015 "{{{1
 - fix issue 29 (plugin always loaded autoload part, 

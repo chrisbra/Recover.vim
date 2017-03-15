@@ -90,13 +90,14 @@ endfun
 
 fu! recover#ConfirmSwapDiff() "{{{1
     if exists("b:swapchoice")
-	let v:swapchoice = b:swapchoice
-	return
+        let v:swapchoice = b:swapchoice
+        return
     endif
     call s:ModifySTL(1)
     let delete = 0
     let do_modification_check = get(g:, 'RecoverPlugin_Edit_Unmodified', 0)
     let not_modified = 0
+    let pname = ''
     let msg = ""
     let bufname = s:isWin() ? fnamemodify(expand('%'), ':p:8') : shellescape(expand('%'))
     let tfile = tempname()
@@ -123,9 +124,7 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	let end_of_first_par = match(msg, "^$", 2) " output starts with empty line: find 2nd one
 	let msg = msg[1:end_of_first_par] " get relevant part of output
 	let msg = join(msg, "\n")
-	if do_modification_check
-	    let not_modified = (match(msg, "modified: no") > -1)
-	endif
+    let not_modified = (match(msg, "modified: no") > -1)
     endif
     if has("unix") && !empty(msg) && system("uname") =~? "linux"
 	" try to get process name from pid
@@ -137,20 +136,25 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	    let pname = 'not existing'
 	    let proc = '/proc/'. pid. '/status'
 	    if filereadable(proc)
-		let pname = matchstr(readfile(proc)[0], '^Name:\s*\zs.*')
+            let pname = matchstr(readfile(proc)[0], '^Name:\s*\zs.*')
 	    endif
 	    let msg = substitute(msg, pid_pat, '& ['.pname."]\n", '')
-	    if not_modified && pname !~? 'vim'
-		let not_modified = 0
+	    if not_modified && pname =~? 'vim'
+            let not_modified = 0
 	    endif
 	endif
+        if get(g:, 'RecoverPlugin_Delete_Unmodified_Swapfile', 0) && pname !~# 'vim'
+            \ && not_modified
+            let v:swapchoice = 'd'
+            return
+        endif
     endif
     " Show modification message and present user question about what to do:
     if executable(v:progpath) && executable('diff') "&& s:isWin()
 	" Check, whether the files differ issue #7
 	" doesn't work on Windows? (cmd is ok, should be executable)
 	if s:isWin()
-	    let tfile = substitute(tfile, '/', '\\', 'g')
+        let tfile = substitute(tfile, '/', '\\', 'g')
 	endif
         " disable fenc setting to avoid conversion errors
 	let cmd = printf("%s -i NONE -u NONE -N %s -r %s -c ':set fenc=' -c ':w %s|:q!' %s diff %s %s",
@@ -160,15 +164,15 @@ fu! recover#ConfirmSwapDiff() "{{{1
 		    \ tfile, (s:isWin() ? '&' : '&&'),
 		    \ bufname, tfile)
 	call system(cmd)
-	" if return code of diff is zero, files are identical
+        " if return code of diff is zero, files are identical
         if !v:shell_error
-                " only delete, if the file is not already open in another Vim
-                " instance
-                if  exists("pname") && pname =~? 'vim'
-                        let delete = 0
-                else
-                        let delete = 1
-                endif
+            " only delete, if the file is not already open in another Vim
+            " instance
+            if  pname =~? 'vim'
+                let delete = 0
+            else
+                let delete = 1
+            endif
         endif
 	if !do_modification_check
 	    echo msg
@@ -436,4 +440,4 @@ endfu
 
 
 " Modeline "{{{1
-" vim:fdl=0 ts=8
+" vim:fdl=0 ts=4
