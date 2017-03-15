@@ -1,4 +1,4 @@
-" Vimball Archiver by Charles E. Campbell, Jr., Ph.D.
+" Vimball Archiver by Charles E. Campbell
 UseVimball
 finish
 plugin/recover.vim	[[[1
@@ -60,7 +60,7 @@ unlet s:keepcpo
 " Modeline {{{1
 " vim: fdm=marker sw=2 sts=2 ts=8 fdl=0
 autoload/recover.vim	[[[1
-425
+439
 " Vim plugin for diffing when swap file was found
 " ---------------------------------------------------------------
 " Author: Christian Brabandt <cb@256bit.org>
@@ -173,14 +173,19 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	"   let wincmd = printf('-c "redir > %s|1d|:q!" ', tfile)
 	"   let wincmd = printf('-c "call feedkeys(\"o\n\e:q!\n\")"')
 	" endif
-	let cmd = printf("%s %s -u NONE -es -V %s %s",
-	    \ (s:isWin() ? '' : 'TERM=vt100 LC_ALL=C'),
+	let t = tempname()
+	let cmd = printf("%s %s -i NONE -u NONE -es -V0%s %s %s",
+	    \ (s:isWin() ? '' : 'LC_ALL=C'),
 	    \ s:progpath,
+	    \ t,
 	    \ (s:isWin() ? wincmd : ''),
 	    \ bufname)
-	let msg = system(cmd)
-	let msg = substitute(msg, '.*\(E325.*process ID:.\{-}\)\%x0d.*', '\1', '')
-	let msg = substitute(msg, "\e\\[\\d\\+C", "", "g")
+	call system(cmd)
+	let msg = readfile(t)
+	call delete(t)
+	let end_of_first_par = match(msg, "^$", 2) " output starts with empty line: find 2nd one
+	let msg = msg[1:end_of_first_par] " get relevant part of output
+	let msg = join(msg, "\n")
 	if do_modification_check
 	    let not_modified = (match(msg, "modified: no") > -1)
 	endif
@@ -210,7 +215,8 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	if s:isWin()
 	    let tfile = substitute(tfile, '/', '\\', 'g')
 	endif
-	let cmd = printf("%s -u NONE -N %s -r %s -c \":w %s|:q!\" %s diff %s %s",
+        " disable fenc setting to avoid conversion errors
+	let cmd = printf("%s -i NONE -u NONE -N %s -r %s -c ':set fenc=' -c ':w %s|:q!' %s diff %s %s",
 		    \ s:progpath,
 		    \ (s:isWin() ? '' : '-es'),
 		    \ (s:isWin() ? fnamemodify(v:swapname, ':p:8') : shellescape(v:swapname)),
@@ -218,7 +224,15 @@ fu! recover#ConfirmSwapDiff() "{{{1
 		    \ bufname, tfile)
 	call system(cmd)
 	" if return code of diff is zero, files are identical
-	let delete = !v:shell_error
+        if !v:shell_error
+                " only delete, if the file is not already open in another Vim
+                " instance
+                if  exists("pname") && pname =~? 'vim'
+                        let delete = 0
+                else
+                        let delete = 1
+                endif
+        endif
 	if !do_modification_check
 	    echo msg
 	endif
@@ -485,7 +499,7 @@ endfu
 
 
 " Modeline "{{{1
-" vim:fdl=0
+" vim:fdl=0 ts=8
 doc/recoverPlugin.txt	[[[1
 357
 *recover.vim*   Show differences for recovered files
