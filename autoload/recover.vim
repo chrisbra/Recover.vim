@@ -152,7 +152,8 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	if s:isWin()
 	    let tfile = substitute(tfile, '/', '\\', 'g')
 	endif
-	let cmd = printf("%s -i NONE -u NONE -N %s -r %s -c \":w %s|:q!\" %s diff %s %s",
+        " disable fenc setting to avoid conversion errors
+	let cmd = printf("%s -i NONE -u NONE -N %s -r %s -c ':set fenc=' -c ':w %s|:q!' %s diff %s %s",
 		    \ s:progpath,
 		    \ (s:isWin() ? '' : '-es'),
 		    \ (s:isWin() ? fnamemodify(v:swapname, ':p:8') : shellescape(v:swapname)),
@@ -427,4 +428,4 @@ endfu
 
 
 " Modeline "{{{1
-" vim:fdl=0
+" vim:fdl=0 ts=8
