@@ -22,6 +22,8 @@ When you open a file and vim detects that an swap-file already exists for a buff
     Please choose:
     D[i]ff, (O)pen Read-Only, (E)dit anyway, (R)ecover, (Q)uit, (A)bort, (D)elete:
 
+Press **i** (and not `D`) to have the diff shown.
+
 Note that additionally it shows the process ID of the process that opened that file, or that it is not existing if that process doesn't exist. Simply use the key that is highlighted to chose the option. If you press Ctrl-C, the default dialog of Vim will be shown.
 
 If you have said 'Diff', the plugin opens a new vertical splitt buffer. On the left side, you'll find the file as it is stored on disk and the right side will contain your recovered version of the file (using the found swap file).
