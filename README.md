@@ -1,15 +1,26 @@
-Recover
-======
-> Show differences for recovered files
+# Recover.vim adds a diff option when Vim finds a swap file
 
-When editing files with Vim and one trips about existing swap files, it is hard to tell what has been changed between the swap file and the actual on disk version. The aim of this plugin is to have an easy way to see differences between the swap files and the files stored on disk.
+When you open a file in Vim but it was already open in another instance or not
+closed properly in a past edit, Vim will warn you, but it won't show you what
+the difference is between the hidden swap file and the regular saved file. Of
+all the actions you might want to do, the most obvious one is missing: see a
+diff.
 
-Therefore this plugin sets up an auto command that will create a diff buffer between the recovered file and the on-disk version of the same file. You can easily see what has been changed and save your recovered work back to the file on disk.
+## Installation
 
-By default this plugin is enabled. To disable it, use `:RecoverPluginDisable`
-To enable this plugin again, use `:RecoverPluginEnable`
+We recommend installing with a plugin manager (there are several).
 
-When you open a file and vim detects that an swap-file already exists for a buffer, the plugin presents the default Swap-Exists dialog from Vim adding one additional option for Diffing (but leaves out the lengthy explanation about handling Swapfiles that Vim by default shows):
+Alternatively, download the plugin (either the [stable][] or [unstable][]
+version), edit it with Vim (`vim Recover.vmb`), then source it (`:so %`), and
+finally restart Vim. You can check successful installation by opening the help
+file (`:h RecoverPlugin`).
+
+[unstable]: https://github.com/chrisbra/Recover.vim
+[stable]: http://www.vim.org/scripts/script.php?script_id=3068
+
+## How to use
+
+Recover.vim adds a new first entry to the list of actions, like this:
 
     Found a swap file by the name "test/normal/.testfile.swp"
             owned by: chrisbra   dated: Wed Nov 28 16:26:42 2012
@@ -22,38 +33,58 @@ When you open a file and vim detects that an swap-file already exists for a buff
     Please choose:
     D[i]ff, (O)pen Read-Only, (E)dit anyway, (R)ecover, (Q)uit, (A)bort, (D)elete:
 
-Press **i** (and not `D`) to have the diff shown.
+**Notice that the `D[i]ff` option means pressing `i` (and not `D`!)**.
+(unfortunately, D is already claimed by Delete, and we can use R for Remove
+because that's claimed by Recover)
 
-Note that additionally it shows the process ID of the process that opened that file, or that it is not existing if that process doesn't exist. Simply use the key that is highlighted to chose the option. If you press Ctrl-C, the default dialog of Vim will be shown.
+Also, in the case that an active process has the swap file open, Recover.vim
+adds the relevant process ID to the dialog to make that easier to find.
 
-If you have said 'Diff', the plugin opens a new vertical splitt buffer. On the left side, you'll find the file as it is stored on disk and the right side will contain your recovered version of the file (using the found swap file).
+If you choose the new `D[i]ff` option, you'll see a vertical splitt buffer. On
+the left side, you'll see the file as it is stored on disk. On the right side,
+you'll see the diff from the recovered swap file.
 
-You can now use the usual merge commands to copy the contents to the buffer that holds your recovered version. If you are finished, you can close the diff version and close the window, by issuing `:diffoff!` and `:close` in the window that contains the on-disk version of the file. Be sure to save the recovered version of your file and afterwards you can safely remove the swap file.
+You can then use the usual Vim merge commands if you want to copy the contents
+from the swap buffer. When you are finished, you can close the diff version and
+close the window, by issuing `:diffoff!` and `:close` in the window that
+contains the on-disk version of the file. Be sure to save the recovered version
+of your file.
 
-In the recovered window, the command `:FinishRecovery` deletes the swapfile, closes the diff window and finishes everything up. Alternatively you can also use the command `:RecoveryPluginFinish`
+To delete the no-longer-needed swap file when in the recovered window, use the
+command `:FinishRecovery`. That will delete the swapfile, close the diff window,
+and end the diff/merge process. Alternatively, you can use the command
+`:RecoveryPluginFinish`.
 
-The command `:RecoverPluginHelp` show a small message on what keys can be used to move to the next different region and how to merge the changes from one windo into the other.
+The command `:RecoverPluginHelp` show a small message on what keys can be used
+to move to the next different region and how to merge the changes from one
+window into the other.
 
-If your Vim was built with `+balloon_eval`, recover.vim will also set up an balloon expression that shows you which buffer contains the recovered version of your file and which buffer contains the unmodified on-disk version of your file, if you move the mouse of the buffer.
+If your Vim was built with `+balloon_eval`, Recover.vim will also set up an
+balloon expression that shows you which buffer contains the recovered version of
+your file and which buffer contains the unmodified on-disk version of your file,
+if you move the mouse of the buffer.
 
-If you have setup your `statusline`, recover.vim will also inject some info about which buffer contains the on-disk version and which buffer contains the modified, recovered version. Additionally the buffer that is read-only will have a filename  of something like `original file (on disk-version)`. If you want to save that version, use :saveas.
+If you have setup your `statusline`, Recover.vim will also inject some info
+about which buffer contains the on-disk version and which buffer contains the
+modified, recovered version. Additionally, the read-only buffer will have a
+filename  of something like `original file (on disk-version)`. If you want to
+save that version, use :saveas.
 
-Installation
----
+Get more help via `:h RecoverPlugin-manual`
 
-Use the plugin manager of your choice. Or download the [stable][] or [unstable][] version of the plugin, edit it with Vim (`vim Recover.vmb`) and simply source it (`:so %`). Restart and take a look at the help (`:h RecoverPlugin`)
+## How to enable or disable Recover.vim
 
-[unstable]: https://github.com/chrisbra/Recover.vim
-[stable]: http://www.vim.org/scripts/script.php?script_id=3068
+Once installed, Recover.vim is enabled by default.. To disable it, use
+`:RecoverPluginDisable`. To enable it again, use `:RecoverPluginEnable`.
 
-Usage
----
-Once installed, take a look at the help at `:h RecoverPlugin-manual`
+When enabled, you can also do a one-time skip of the Recover.vim dialog with
+Ctrl-C. Then, the default Vim dialog (without the D[i]ff option) will be shown.
+
 
 License & Copyright
 -------
 
 The Vim License applies. See `:h license`
-© 2009 - 2013 by Christian Brabandt
+© 2009 - 2017 by Christian Brabandt
 
 __NO WARRANTY, EXPRESS OR IMPLIED.  USE AT-YOUR-OWN-RISK__
