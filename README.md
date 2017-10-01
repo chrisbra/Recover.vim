@@ -33,7 +33,7 @@ Recover.vim adds a new first entry to the list of actions, like this:
     Please choose:
     D[i]ff, (O)pen Read-Only, (E)dit anyway, (R)ecover, (Q)uit, (A)bort, (D)elete:
 
-**Notice that the `D[i]ff` option means pressing `i` and not `D`!**.
+**Notice that the `D[i]ff` option means pressing `i` and not `D`!**
 (unfortunately, D is already claimed by Delete, and we can't use R for Remove
 because that's claimed by Recover)
 
