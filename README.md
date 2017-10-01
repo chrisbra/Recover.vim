@@ -33,14 +33,14 @@ Recover.vim adds a new first entry to the list of actions, like this:
     Please choose:
     D[i]ff, (O)pen Read-Only, (E)dit anyway, (R)ecover, (Q)uit, (A)bort, (D)elete:
 
-**Notice that the `D[i]ff` option means pressing `i` (and not `D`!)**.
-(unfortunately, D is already claimed by Delete, and we can use R for Remove
+**Notice that the `D[i]ff` option means pressing `i` and not `D`!**.
+(unfortunately, D is already claimed by Delete, and we can't use R for Remove
 because that's claimed by Recover)
 
 Also, in the case that an active process has the swap file open, Recover.vim
 adds the relevant process ID to the dialog to make that easier to find.
 
-If you choose the new `D[i]ff` option, you'll see a vertical splitt buffer. On
+If you choose the new `D[i]ff` option, you'll see a vertical split buffer. On
 the left side, you'll see the file as it is stored on disk. On the right side,
 you'll see the diff from the recovered swap file.
 
