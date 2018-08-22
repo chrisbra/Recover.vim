@@ -167,7 +167,7 @@ fu! recover#ConfirmSwapDiff() "{{{1
   if delete && !do_modification_check
     echomsg "Swap and on-disk file seem to be identical"
   endif
-  let cmd = printf("D&iff\n&Open Read-Only\n&Edit anyway\n&Recover\n&Quit\n&Abort%s",
+  let cmd = printf("&Compare\n&Open Read-Only\n&Edit anyway\n&Recover\n&Quit\n&Abort%s",
     \ ( (delete || !empty(msg)) ? "\n&Delete" : ""))
   if !empty(msg)
     let info = 'Please choose: '

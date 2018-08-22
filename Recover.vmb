@@ -226,7 +226,7 @@ fu! recover#ConfirmSwapDiff() "{{{1
   if delete && !do_modification_check
     echomsg "Swap and on-disk file seem to be identical"
   endif
-  let cmd = printf("D&iff\n&Open Read-Only\n&Edit anyway\n&Recover\n&Quit\n&Abort%s",
+  let cmd = printf("&Compare\n&Open Read-Only\n&Edit anyway\n&Recover\n&Quit\n&Abort%s",
     \ ( (delete || !empty(msg)) ? "\n&Delete" : ""))
   if !empty(msg)
     let info = 'Please choose: '
@@ -423,7 +423,7 @@ endfu
 " Modeline "{{{1
 " vim: fdm=marker fdl=0 ts=2 et sw=0 sts=-1
 doc/recoverPlugin.txt	[[[1
-368
+367
 *recover.vim*   Show differences for recovered files
 
 Author:  Christian Brabandt <cb@256bit.org>
@@ -449,22 +449,22 @@ Copyright: (c) 2009, 2010, 2011, 2012, 2013 by Christian Brabandt
 
 Functionality
 
-When using |recovery|, it is hard to tell, what has been changed between the
-recovered file and the actual on disk version. The aim of this plugin is, to
-have an easy way to see differences, between the recovered files and the files
+When using |recovery|, it is hard to tell what has been changed between the
+recovered file and the actual on disk version. The aim of this plugin is to
+have an easy way to see differences between the recovered files and the files
 stored on disk.
 
-By default, it will become only active, when a swap file is detected and
-enable you to see a diff of the recovered swapfile and the actual file. You
-can now use the commands |:RecoveryPluginGet| (to get all differences from the
-recovered swapfile) and |:RecoverPluginFinish|(to discard the swapfile
-changes) and close the diff mode. Thus those two commands work to easily
+By default, it will become only active when a swap file is detected. It will
+then enable you to see a diff of the recovered swapfile and the actual file. You
+can now use the commands |:RecoveryPluginGet| to get all differences from the
+recovered swapfile and |:RecoverPluginFinish|to discard the swapfile
+changes and close the diff mode. Thus those two commands work to easily
 discard the changes |:RecoveryPluginFinish| or to recover |:RecoveryPluginGet| 
 from the swapfile.
 
-Therefore this plugin sets up an auto command, that will create a diff buffer
+This plugin sets up an auto command that will create a diff buffer
 between the recovered file and the on-disk version of the same file. You can
-easily see, what has been changed and save your recovered work back to the
+easily see what has been changed and save your recovered work back to the
 file on disk.
 
 By default this plugin is enabled. To disable it, use >
@@ -473,10 +473,10 @@ By default this plugin is enabled. To disable it, use >
 To enable this plugin again, use >
     :RecoverPluginEnable
 <
-When you open a file and vim detects, that an |swap-file| already exists for a
+When you open a file and vim detects that an |swap-file| already exists for a
 buffer, the plugin presents the default Swap-Exists dialog from Vim adding one
 additional option for Diffing (but leaves out the lengthy explanation about
-handling Swapfiles that Vim by default shows): >
+handling swapfiles that Vim by default shows): >
 
     Found a swap file by the name "test/normal/.testfile.swp"
             owned by: chrisbra   dated: Wed Nov 28 16:26:42 2012
@@ -487,15 +487,14 @@ handling Swapfiles that Vim by default shows): >
     While opening file "test/normal/testfile"
                 dated: Tue Nov  6 20:11:55 2012
     Please choose:
-    D[i]ff, (O)pen Read-Only, (E)dit anyway, (R)ecover, (Q)uit, (A)bort, (D)elete:
+    [C]ompare, (O)pen Read-Only, (E)dit anyway, (R)ecover, (Q)uit, (A)bort, (D)elete:
 
 
-(Note, that additionally, it shows in the process ID row the name of the
-process that has the process id or [not existing] if that process doesn't
-exist.) Simply use the key, that is highlighted to chose the option. If you
+(Note, it also shows the process IDor [not existing] if that process doesn't
+exist.) Simply use the key that is highlighted to chose the option. If you
 press Ctrl-C, the default dialog of Vim will be shown.
 
-If you have said 'Diff', the plugin opens a new vertical splitt buffer. On the
+If you have said 'Compare', the plugin opens a new vertical splitt buffer. On the
 left side, you'll find the file as it is stored on disk and the right side
 will contain your recovered version of the file (using the found swap file).
 
@@ -547,12 +546,12 @@ Note: This only works on Linux.
 
 If you do not want Vim to examine the existing swapfile and figure out things
 like whether the file is unmodified in another Vim process and to check the
-process id, then you need to set the configuration variable
+process ID, then you need to set the configuration variable
 g:RecoverPlugin_Examine_Swapfile to 1 like this in your |.vimrc| >
 
     :let g:RecoverPlugin_No_Check_Swapfile = 1
 <
-If you Vim to silently delete unmodified swapfiles, that are not being edited
+If you want Vim to silently delete unmodified swapfiles that are not being edited
 in another session, set the variable g:RecoverPlugin_Delete_Unmodified Swapfile
 to 1 like this in your |.vimrc| >
 
@@ -561,20 +560,20 @@ to 1 like this in your |.vimrc| >
 Note: This only works on Linux.
                                                         *RecoverPlugin-misc*
 If your Vim was built with |+balloon_eval|, recover.vim will also set up an
-balloon expression, that shows you, which buffer contains the recovered
+balloon expression that shows you which buffer contains the recovered
 version of your file and which buffer contains the unmodified on-disk version
-of your file, if you move the mouse of the buffer. (See |balloon-eval|).
+of your file if you move the mouse over the buffer. (See |balloon-eval|).
 
-If you have setup your 'statusline', recover.vim will also inject some info
-(which buffer contains the on-disk version and which buffer contains the
-modified, recovered version). Additionally the buffer that is read-only, will
+If you have setup your 'statusline', recover.vim will also inject info about
+which buffer contains the on-disk version and which buffer contains the
+modified, recovered version. Additionally the buffer that is read-only will
 have a filename (|:f|) of something like 'original file (on disk-version)'. If
 you want to save that version, use |:saveas|.
 
 ==============================================================================
 3. CVIM	                                        	            	*cvim*
 
-cvim is a python script (contributed by Marcin Szamotulski) that is
+cvim is a Python script (contributed by Marcin Szamotulski) that is
 distributed together with the recoverplugin. It is located in the contrib/
 folder of the plugin source (or in the contrib/ directory of your $VIMRUNTIME/
 path (e.g. usually in ~/.vim/contrib) if you have installed the vimball
@@ -584,7 +583,7 @@ Usage:
 
 cvim [-h] [-r] [-f] [-a] {directory} ...
 
-    cvim is a python script, which can be used in a terminal to clear the
+    cvim is a Python script, which can be used in a terminal to clear the
     {directory} from |swapfile|s.  Without any switches it finds all
     |swapfile|s then checks if a found |swapfile| is used by vim (using psutil
     python library).  If it is not, then it reads the |swapfile| and if the

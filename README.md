@@ -3,8 +3,8 @@
 When you open a file in Vim but it was already open in another instance or not
 closed properly in a past edit, Vim will warn you, but it won't show you what
 the difference is between the hidden swap file and the regular saved file. Of
-all the actions you might want to do, the most obvious one is missing: see a
-diff.
+all the actions you might want to do, the most obvious one is missing: compare,
+that is, see a diff.
 
 ## Installation
 
@@ -31,16 +31,12 @@ Recover.vim adds a new first entry to the list of actions, like this:
     While opening file "test/normal/testfile"
                 dated: Tue Nov  6 20:11:55 2012
     Please choose:
-    D[i]ff, (O)pen Read-Only, (E)dit anyway, (R)ecover, (Q)uit, (A)bort, (D)elete:
-
-**Notice that the `D[i]ff` option means pressing `i` and not `D`!**
-(unfortunately, D is already claimed by Delete, and we can't use R for Remove
-because that's claimed by Recover)
+    [C]ompare, (O)pen Read-Only, (E)dit anyway, (R)ecover, (Q)uit, (A)bort, (D)elete:
 
 Also, in the case that an active process has the swap file open, Recover.vim
 adds the relevant process ID to the dialog to make that easier to find.
 
-If you choose the new `D[i]ff` option, you'll see a vertical split buffer. On
+If you choose the new `[C]ompare` option, you'll see a vertical split buffer. On
 the left side, you'll see the file as it is stored on disk. On the right side,
 you'll see the diff from the recovered swap file.
 
@@ -78,7 +74,7 @@ Once installed, Recover.vim is enabled by default.. To disable it, use
 `:RecoverPluginDisable`. To enable it again, use `:RecoverPluginEnable`.
 
 When enabled, you can also do a one-time skip of the Recover.vim dialog with
-Ctrl-C. Then, the default Vim dialog (without the D[i]ff option) will be shown.
+Ctrl-C. Then, the default Vim dialog (without the `[C]ompare` option) will be shown.
 
 
 License & Copyright

@@ -61,14 +61,14 @@ handling swapfiles that Vim by default shows): >
     While opening file "test/normal/testfile"
                 dated: Tue Nov  6 20:11:55 2012
     Please choose:
-    D[i]ff, (O)pen Read-Only, (E)dit anyway, (R)ecover, (Q)uit, (A)bort, (D)elete:
+    [C]ompare, (O)pen Read-Only, (E)dit anyway, (R)ecover, (Q)uit, (A)bort, (D)elete:
 
 
 (Note, it also shows the process IDor [not existing] if that process doesn't
 exist.) Simply use the key that is highlighted to chose the option. If you
 press Ctrl-C, the default dialog of Vim will be shown.
 
-If you have said 'Diff', the plugin opens a new vertical splitt buffer. On the
+If you have said 'Compare', the plugin opens a new vertical splitt buffer. On the
 left side, you'll find the file as it is stored on disk and the right side
 will contain your recovered version of the file (using the found swap file).
 
