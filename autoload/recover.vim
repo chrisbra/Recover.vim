@@ -8,6 +8,8 @@
 " GetLatestVimScripts: 3068 19 :AutoInstall: recover.vim
 
 let s:progpath=(v:version > 704 || (v:version == 704 && has("patch234")) ? v:progpath : 'vim')
+let s:swapinfo=exists("*swapinfo")
+let s:is_linux = system('uname') =~? 'linux'
 
 fu! s:Swapname() "{{{1
   " Use sil! so a failing redir (e.g. recursive redir call)
@@ -18,6 +20,33 @@ fu! s:Swapname() "{{{1
   else
     return a[1:]
   endif
+endfu
+fu! s:PIDName(pid) "{{{1
+  " Return name of process for given pid
+  " only works on linux with /proc filesystem
+  if !empty(a:pid) && s:is_linux && isdirectory('/proc')
+    let pname = 'not existing'
+    let proc = '/proc/'. a:pid. '/status'
+    if filereadable(proc)
+      let pname = matchstr(readfile(proc)[0], '^Name:\s*\zs.*')
+    endif
+    return pname
+  endif
+  return ''
+endfu
+fu! s:AttentionMessage(swap_info, pname)
+  let statinfo = executable('stat') ? systemlist('stat --printf="%U\n%Y\n" '. a:swap_info['fname']) : []
+  let owner = get(statinfo, 0, '')
+  let time  = get(statinfo, 1, '')
+  return [ 'E325: ATTENTION',
+      \   'Found a swap file by the name "'.v:swapname. '"',
+      \   "\t". '  owned by: '. owner. '  dated: '. time,
+      \   "\t". ' file name: '. a:swap_info['fname'],
+      \   "\t". '  modified: '. (a:swap_info['dirty'] ? 'YES' : 'no'),
+      \   "\t". ' user name: '. a:swap_info['user']. '  host name: '. a:swap_info['host'],
+      \   "\t". 'process ID: '. a:swap_info['pid']. (!empty(a:pname) ? ' ['.a:pname.'] (still running)' : ''),
+      \   "\t". 'While opening file "'. a:swap_info['fname']. '"',
+      \   "\t". '   dated: '. strftime('%c', a:swap_info['mtime']) ]
 endfu
 fu! recover#CheckSwapFileExists() "{{{1
   if !&swapfile
@@ -96,53 +125,52 @@ fu! recover#ConfirmSwapDiff() "{{{1
   let msg = ""
   let bufname = s:isWin() ? fnamemodify(expand('%'), ':p:8') : shellescape(expand('%'))
   let tfile = tempname()
-  if executable(s:progpath) && !s:isWin() && !s:isMacTerm() && !get(g:, 'RecoverPlugin_No_Check_Swapfile', 0)
-    " Doesn't work on windows (system() won't be able to fetch the output)
-    " and Mac Terminal (issue #24)  
-    " Capture E325 Warning message
-    " Leave English output, so parsing will be easier
-    " TODO: make it work on windows.
-    " if s:isWin()
-    "   let wincmd = printf('-c "redir > %s|1d|:q!" ', tfile)
-    "   let wincmd = printf('-c "call feedkeys(\"o\n\e:q!\n\")"')
-    " endif
-    let t = tempname()
-    let cmd = printf("%s %s -i NONE -u NONE -es -V0%s %s %s",
-      \ (s:isWin() ? '' : 'LC_ALL=C'), s:progpath, t,
-      \ (s:isWin() ? wincmd : ''), bufname)
-    call system(cmd)
-    let msgl = readfile(t)
-    call delete(t)
-    let end_of_first_par = match(msgl, "^$", 2) " output starts with empty line: find 2nd one
-    let msgl = msgl[1:end_of_first_par] " get relevant part of output
-    let msg = join(msgl, "\n")
-    let not_modified = (match(msg, "modified: no") > -1)
+  if s:swapinfo
+    let swap_info = swapinfo(v:swapname)
+    if has_key(swap_info, 'error')
+      " swap file not usable
+      echom "Recover.vim: Problem with Swapfile: '". swap_info['error']. "'"
+      return 
+    endif
+    let pid = swap_info['pid']
+    let pname = s:PIDName(pid)
+    let msg = join(s:AttentionMessage(swap_info, pname), "\n")
+    let not_modified = swap_info['dirty'] == 0
+  else
+    if executable(s:progpath) && !s:isWin() && !s:isMacTerm() && !get(g:, 'RecoverPlugin_No_Check_Swapfile', 0)
+      " Doesn't work on windows (system() won't be able to fetch the output)
+      " and Mac Terminal (issue #24)  
+      " Capture E325 Warning message
+      " Leave English output, so parsing will be easier
+      " TODO: make it work on windows.
+      " if s:isWin()
+      "   let wincmd = printf('-c "redir > %s|1d|:q!" ', tfile)
+      "   let wincmd = printf('-c "call feedkeys(\"o\n\e:q!\n\")"')
+      " endif
+      let t = tempname()
+      let cmd = printf("%s %s -i NONE -u NONE -es -V0%s %s %s",
+        \ (s:isWin() ? '' : 'LC_ALL=C'), s:progpath, t,
+        \ (s:isWin() ? wincmd : ''), bufname)
+      call system(cmd)
+      let msgl = readfile(t)
+      call delete(t)
+      let end_of_first_par = match(msgl, "^$", 2) " output starts with empty line: find 2nd one
+      let msgl = msgl[1:end_of_first_par] " get relevant part of output
+      let msg = join(msgl, "\n")
+      let not_modified = (match(msg, "modified: no") > -1)
+    endif
+    if has("unix") && !empty(msg) && s:is_linux
+      " try to get process name from pid
+      " This is Linux specific.
+      " TODO Is there a portable way to retrive this info for at least unix?
+      let pid_pat = 'process ID:\s*\zs\d\+'
+      let pid = matchstr(msg, pid_pat)+0
+      let pname = s:PIDName(pid)
+        let msg = substitute(msg, pid_pat, '& ['.pname."]\n", '')
+    endif
   endif
-  if has("unix") && !empty(msg) && system("uname") =~? "linux"
-    " try to get process name from pid
-    " This is Linux specific.
-    " TODO Is there a portable way to retrive this info for at least unix?
-    let pid_pat = 'process ID:\s*\zs\d\+'
-    let pid = matchstr(msg, pid_pat)+0
-    if !empty(pid) && isdirectory('/proc')
-      let pname = 'not existing'
-      let proc = '/proc/'. pid. '/status'
-      if filereadable(proc)
-        let pname = matchstr(readfile(proc)[0], '^Name:\s*\zs.*')
-      endif
-      let msg = substitute(msg, pid_pat, '& ['.pname."]\n", '')
-      if not_modified && pname =~? 'vim'
-        let not_modified = 0
-      endif
-    endif
-      if get(g:, 'RecoverPlugin_Delete_Unmodified_Swapfile', 0) && pname !~# 'vim'
-        \ && not_modified
-        let v:swapchoice = 'd'
-        return
-      endif
-    endif
-    " Show modification message and present user question about what to do:
-    if executable(s:progpath) && executable('diff') "&& s:isWin()
+  " Show modification message and present user question about what to do:
+  if executable(s:progpath) && executable('diff') "&& s:isWin()
     " Check, whether the files differ issue #7
     " doesn't work on Windows? (cmd is ok, should be executable)
     if s:isWin()
@@ -159,9 +187,13 @@ fu! recover#ConfirmSwapDiff() "{{{1
       " only delete, if the file is not already open in another Vim instance
       let delete = (pname =~? 'vim') ? 0 : 1
     endif
-    if !do_modification_check
-      echo msg
-    endif
+  endif
+  if get(g:, 'RecoverPlugin_Delete_Unmodified_Swapfile', 0) && not_modified
+    let v:swapchoice = 'd'
+    return
+  endif
+  if !do_modification_check && not_modified && (empty(pname) || pname =~? 'vim')
+    echo msg
   endif
   call delete(tfile)
   if delete && !do_modification_check
