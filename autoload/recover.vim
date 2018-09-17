@@ -192,7 +192,7 @@ fu! recover#ConfirmSwapDiff() "{{{1
     let v:swapchoice = 'd'
     return
   endif
-  if !do_modification_check && not_modified && (empty(pname) || pname =~? 'vim')
+  if !do_modification_check && !not_modified && (empty(pname) || pname =~? 'vim')
     echo msg
   endif
   call delete(tfile)
