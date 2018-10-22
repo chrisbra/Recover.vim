@@ -9,7 +9,7 @@
 
 let s:progpath=(v:version > 704 || (v:version == 704 && has("patch234")) ? v:progpath : 'vim')
 let s:swapinfo=exists("*swapinfo")
-let s:is_linux = system('uname') =~? 'linux'
+let s:is_linux = has("unix") && system('uname') =~? 'linux'
 
 fu! s:Swapname() "{{{1
   " Use sil! so a failing redir (e.g. recursive redir call)
