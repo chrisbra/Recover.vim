@@ -211,6 +211,11 @@ fu! recover#ConfirmSwapDiff() "{{{1
     let p = 3
   else
     call inputsave()
+    if has("nvim")
+      " Force the msg to be drawn for Neovim, fixes
+      " https://github.com/chrisbra/Recover.vim/issues/59
+      echo msg
+    endif
     let p = confirm(info, cmd, (delete ? 7 : 1), 'I')
     call inputrestore()
   endif
