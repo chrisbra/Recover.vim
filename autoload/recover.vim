@@ -148,8 +148,9 @@ fu! recover#ConfirmSwapDiff() "{{{1
       "   let wincmd = printf('-c "call feedkeys(\"o\n\e:q!\n\")"')
       " endif
       let t = tempname()
-      let cmd = printf("%s %s -i NONE -u NONE -es -V0%s %s %s",
+      let cmd = printf("%s %s -i NONE -u NONE -es -V0%s %s %s %s",
         \ (s:isWin() ? '' : 'LC_ALL=C'), s:progpath, t,
+        \ (!empty(&directory) ? '--cmd ":set directory="' . shellescape(&directory) : ''),
         \ (s:isWin() ? wincmd : ''), bufname)
       call system(cmd)
       let msgl = readfile(t)
