@@ -193,7 +193,8 @@ fu! recover#ConfirmSwapDiff() "{{{1
     let v:swapchoice = 'd'
     return
   endif
-  if !do_modification_check && !not_modified && (empty(pname) || pname =~? 'vim')
+  let prompt_verbose = get(g:, 'RecoverPlugin_Prompt_Verbose', 0)
+  if prompt_verbose || (!do_modification_check && !not_modified && (empty(pname) || pname =~? 'vim'))
     echo msg
   endif
   call delete(tfile)
@@ -207,9 +208,7 @@ fu! recover#ConfirmSwapDiff() "{{{1
   else
     let info = "Swap File '". v:swapname. "' found: "
   endif
-  if not_modified
-    let p = 3
-  else
+  if prompt_verbose || !not_modified
     call inputsave()
     if has("nvim")
       " Force the msg to be drawn for Neovim, fixes
@@ -218,6 +217,8 @@ fu! recover#ConfirmSwapDiff() "{{{1
     endif
     let p = confirm(info, cmd, (delete ? 7 : 1), 'I')
     call inputrestore()
+  elseif not_modified
+    let p = 3
   endif
   let b:swapname=v:swapname
   if p == 1 || p == 3
