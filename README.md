@@ -1,4 +1,4 @@
-# Recover.vim adds a diff option when Vim finds a swap file [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/chrisbra)
+# Recover.vim adds a diff option when Vim finds a swap file [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/cb%40256bit.org)
 
 
 When you open a file in Vim but it was already open in another instance or not
