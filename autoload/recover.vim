@@ -9,7 +9,10 @@
 
 let s:progpath=(v:version > 704 || (v:version == 704 && has("patch234")) ? v:progpath : 'vim')
 let s:swapinfo=exists("*swapinfo")
-let s:is_linux = has("unix") && system('uname') =~? 'linux'
+" Assume linux, when the /proc directory is there.
+" Note: system('uname') might be slow, so fall back to using isdirectory('/proc')
+"let s:is_linux = has("unix") && system('uname') =~? 'linux'
+let s:is_linux = has("unix") && isdirectory('/proc')
 
 fu! s:Swapname() "{{{1
   " Use sil! so a failing redir (e.g. recursive redir call)
@@ -24,7 +27,7 @@ endfu
 fu! s:PIDName(pid) "{{{1
   " Return name of process for given pid
   " only works on linux with /proc filesystem
-  if !empty(a:pid) && s:is_linux && isdirectory('/proc')
+  if !empty(a:pid) && s:is_linux
     let pname = 'not existing'
     let proc = '/proc/'. a:pid. '/status'
     if filereadable(proc)
