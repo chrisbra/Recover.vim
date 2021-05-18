@@ -17,7 +17,11 @@ let s:is_linux = has("unix") && isdirectory('/proc')
 fu! s:Swapname() "{{{1
   " Use sil! so a failing redir (e.g. recursive redir call)
   " won't hurt. (https://github.com/chrisbra/Recover.vim/pull/8)
-  sil! redir => a |sil swapname|redir end
+  if exists('*execute')
+    let a=execute('swapname')
+  else
+    sil! redir => a |sil swapname|redir end
+  endif
   if a[1:] == 'No swap file'
     return ''
   else
