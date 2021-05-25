@@ -164,7 +164,7 @@ class Swap(object):
 
         for process in psutil.process_iter():
             try:
-                files = process.get_open_files()
+                files = process.open_files()
             except psutil.AccessDenied:
                 files = []
             except psutil.error.NoSuchProcess:
