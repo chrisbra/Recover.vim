@@ -50,7 +50,7 @@ of your file.
 To delete the no-longer-needed swap file when in the recovered window, use the
 command `:FinishRecovery`. That will delete the swapfile, close the diff window,
 and end the diff/merge process. Alternatively, you can use the command
-`:RecoveryPluginFinish`.
+`:RecoverPluginFinish`.
 
 The command `:RecoverPluginHelp` show a small message on what keys can be used
 to move to the next different region and how to merge the changes from one

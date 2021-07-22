@@ -30,10 +30,10 @@ stored on disk.
 
 By default, it will become only active when a swap file is detected. It will
 then enable you to see a diff of the recovered swapfile and the actual file. You
-can now use the commands |:RecoveryPluginGet| to get all differences from the
+can now use the commands |:RecoverPluginGet| to get all differences from the
 recovered swapfile and |:RecoverPluginFinish|to discard the swapfile
 changes and close the diff mode. Thus those two commands work to easily
-discard the changes |:RecoveryPluginFinish| or to recover |:RecoveryPluginGet| 
+discard the changes |:RecoverPluginFinish| or to recover |:RecoverPluginGet| 
 from the swapfile.
 
 This plugin sets up an auto command that will create a diff buffer
@@ -77,7 +77,7 @@ to close the diff view and delete the swapfile.
 
 When you want to discard the swap file, use the command ":1,$+1diffget" in the right window,
 then close the diff view and delete the swapfile with |:FinishRecovery|. You
-can also use the command |:RecoveryPluginGet|, which will automatically
+can also use the command |:RecoverPluginGet|, which will automatically
 retrieve all changes and finish recovery.
 
 Alternatively you can use the |merge| commands to copy selected content to the buffer
@@ -102,7 +102,7 @@ In the recovered buffer, the command >
 deletes the swapfile closes the diff window and finishes everything up.
 
 Alternatively you can also use the command >
-    :RecoveryPluginFinish
+    :RecoverPluginFinish
 <
                                                         *:RecoverPluginHelp*
 The command >
