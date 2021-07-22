@@ -86,6 +86,15 @@ version and close the window, by issuing |:diffoff!| and |:close| in the
 window, that contains the on-disk version of the file. Be sure to save the
 recovered version of you file and afterwards you can safely remove the swap
 file.
+
+                                                         *RecoverPlugin-Neovim*
+Note: When using Vim and Neovim to edit files at the same time make sure, both
+are configured to use the same swapfile directory (set the |'dir'| option),
+otherwise one Vim won't notice if Neovim has opened the same file (and Neovim
+won't notice if Vim has opened the file) and no dialogue would be shown. This
+happens, because Neovim by default uses the XDG-specification to store swap
+files, while Vim usually stores the swapfile next to the actual edited file.
+
                                         *:RecoverPluginFinish* *:FinishRecovery*
 In the recovered buffer, the command >
     :FinishRecovery
