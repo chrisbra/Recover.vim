@@ -18,7 +18,7 @@ fu! s:Swapname() "{{{1
   " Use sil! so a failing redir (e.g. recursive redir call)
   " won't hurt. (https://github.com/chrisbra/Recover.vim/pull/8)
   if exists('*execute')
-    let a=execute('swapname')
+    let a=trim(execute('swapname'))
   else
     sil! redir => a |sil swapname|redir end
   endif
