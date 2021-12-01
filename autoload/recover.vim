@@ -25,7 +25,7 @@ fu! s:Swapname() "{{{1
   if a[1:] == 'No swap file'
     return ''
   else
-    return a[1:]
+    return a[0] ==# '\n' ? a[1:] : a
   endif
 endfu
 fu! s:PIDName(pid) "{{{1
