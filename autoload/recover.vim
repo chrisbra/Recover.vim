@@ -42,7 +42,7 @@ fu! s:PIDName(pid) "{{{1
   return ''
 endfu
 fu! s:AttentionMessage(swap_info, pname)
-  let statinfo = executable('stat') ? systemlist('stat --printf="%U\n%Y\n" '. a:swap_info['fname']) : []
+  let statinfo = executable('stat') && !has("bsd") ? systemlist('stat --printf="%U\n%Y\n" '. a:swap_info['fname']) : []
   let owner = get(statinfo, 0, '')
   let time  = get(statinfo, 1, '')
   return [ 'E325: ATTENTION',
