@@ -17,16 +17,20 @@ let s:is_linux = has("unix") && isdirectory('/proc')
 fu! s:Swapname() "{{{1
   " Use sil! so a failing redir (e.g. recursive redir call)
   " won't hurt. (https://github.com/chrisbra/Recover.vim/pull/8)
-  if exists('*execute') && exists('*trim')
-    let a=trim(execute('swapname'))
-  else
-    sil! redir => a |sil swapname|redir end
-  endif
-  if a[1:] == 'No swap file'
-    return ''
-  else
-    return a[0] ==# '\n' ? a[1:] : a
-  endif
+  try
+    if exists('*execute') && exists('*trim')
+      let a=trim(execute('swapname'))
+    else
+      sil! redir => a |sil swapname|redir end
+    endif
+    if a[1:] == 'No swap file'
+      return ''
+    else
+      return a[0] ==# '\n' ? a[1:] : a
+    endif
+  catch /^Vim\%((\a\+)\)\=:E48:/
+    " Sandbox: no-op
+  endtry
 endfu
 fu! s:PIDName(pid) "{{{1
   " Return name of process for given pid
